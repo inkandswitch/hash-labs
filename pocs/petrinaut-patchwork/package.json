@@ -1,0 +1,51 @@
+{
+  "name": "@patchwork/petrinaut",
+  "version": "0.0.1",
+  "description": "Petrinaut – Petri Net editor",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "vite build",
+    "push": "pnpm build && patchwork push",
+    "watch": "nodemon --watch src -e js,tsx,ts,tsx,css,json --exec 'pnpm build && pnpm push'"
+  },
+  "keywords": [],
+  "author": "Ink & Switch",
+  "dependencies": {
+    "@automerge/automerge-repo-react-hooks": "2.0.0-alpha.22",
+    "@patchwork/sdk": "file:../../../patchwork/sdk",
+    "@automerge/react": "^2.0.0",
+    "@emotion/react": "11.14.0",
+    "@emotion/styled": "11.14.1",
+    "@fortawesome/free-solid-svg-icons": "6.7.2",
+    "@hashintel/block-design-system": "0.0.5",
+    "@hashintel/design-system": "0.0.9-canary.2",
+    "@mui/material": "5.18.0",
+    "@mui/system": "5.18.0",
+    "elkjs": "0.10.0",
+    "reactflow": "11.11.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-use": "17.6.0",
+    "uuid": "11.1.0",
+    "vite-plugin-wasm": "3.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.9",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "4.3.3",
+    "eslint": "8.45.0",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "eslint-plugin-react-refresh": "0.4.3",
+    "nodemon": "^3.1.9",
+    "typescript": "5.7.3",
+    "typescript-eslint": "7.3.1",
+    "vite": "5",
+    "vite-plugin-css-injected-by-js": "^3.5.2",
+    "vite-plugin-top-level-await": "^1.4.2"
+  }
+}
