@@ -36,8 +36,8 @@ importers:
         specifier: 5.18.0
         version: 5.18.0(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1)
       '@patchwork/sdk':
-        specifier: file:../../patchwork/sdk
-        version: file:../../patchwork/sdk(@types/react-dom@18.3.1)(@types/react@18.3.12)
+        specifier: file:../../../../patchwork/sdk
+        version: file:../../../../patchwork/sdk(@types/react-dom@18.3.1)(@types/react@18.3.12)
       elkjs:
         specifier: 0.10.0
         version: 0.10.0
@@ -59,6 +59,9 @@ importers:
       vite-plugin-wasm:
         specifier: 3.3.0
         version: 3.3.0(vite@5.4.19(@types/node@24.3.0)(lightningcss@1.30.1))
+      zod:
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.0.9
@@ -134,6 +137,12 @@ packages:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
 
+  '@automerge/automerge-repo-react-hooks@2.4.0':
+    resolution: {integrity: sha512-3XF+mJrcQHxsvOHQu0eEHDA43J4WT+BsEZhSefWRps20aQZNhybtxI1BVA8KlJgs7VgiNtUhuM4MvJM5ZeViRQ==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+
   '@automerge/automerge-repo-storage-indexeddb@2.2.0':
     resolution: {integrity: sha512-fob5ITgZs36m9ZqCflGsHYjrHUUC1HWCGe0LejLokAfXAk66ia3Pjbpe8IRz99H/Maeny5GpqwQv4/ykAzpMaA==}
 
@@ -143,14 +152,17 @@ packages:
   '@automerge/automerge-repo@2.2.0':
     resolution: {integrity: sha512-/4cAxnUDPykqdSMJJiJvPlR2VY0JHJnvEoM7fO8qVXwQors34S0VkJEScXRJZExcVhWGhFTwCTWvUbb6hhWQIQ==}
 
+  '@automerge/automerge-repo@2.4.0':
+    resolution: {integrity: sha512-cpSl4VRyu4iDoxi1eFl91mAND+VXnZUt80Clxd15JMn6XD6RUzpAGVACVKLLhgsccqpQQ5VeFuyTFrszHV6PsA==}
+
   '@automerge/automerge@2.2.9':
     resolution: {integrity: sha512-6HM52Ops79hAQBWMg/t0MNfGOdEiXyenQjO9F1hKZq0RWDsMLpPa1SzRy/C4/4UyX67sTHuA5CwBpH34SpfZlA==}
 
-  '@automerge/automerge@3.0.0':
-    resolution: {integrity: sha512-vp/LrAzOyS4J+YmEKRjnCjCUqN6itzz9nKvPEcSLJuapZXfPmY72TYg0F05DVnLCvGe+sLuVAoVntJT6K0qutQ==}
-
   '@automerge/automerge@3.1.1':
     resolution: {integrity: sha512-x7tZiMBLk4/SKYimVEVl1/wPntT9buGvLOWCey9ZcH8JUsB0dgm49C0S7Ojzgvflcs2hc/YjiXRPcFeFkinIgw==}
+
+  '@automerge/automerge@3.2.0':
+    resolution: {integrity: sha512-ANav4cdVYn7TrpeN28fAu9vpWxu8GWwpMJM2JjtfxFULTQnbFCK4y0Wmdk3zaiNgvYSGK0pkbYfCOrxVpXic8w==}
 
   '@automerge/react@2.2.0':
     resolution: {integrity: sha512-lMpYGMlrZiWYTIygIz7zYBe/qsyv4+njA0V8V/kfcmxf8eII1969R2zlGu2lCIYT3Wh7euDVG6/c68WpUj9Wbg==}
@@ -828,8 +840,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@patchwork/sdk@file:../../patchwork/sdk':
-    resolution: {directory: ../../patchwork/sdk, type: directory}
+  '@patchwork/sdk@file:../../../../patchwork/sdk':
+    resolution: {directory: ../../../../patchwork/sdk, type: directory}
 
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
@@ -3362,6 +3374,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@4.1.12:
+    resolution: {integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==}
+
   zrender@5.6.1:
     resolution: {integrity: sha512-OFXkDJKcrlx5su2XbzJvj/34Q3m6PvyCZkVPHGYpcCJ52ek4U/ymZyfuV1nKE23AyBJ51E/6Yr0mhZ7xGTO4ag==}
 
@@ -3453,6 +3468,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@automerge/automerge-repo-react-hooks@2.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@automerge/automerge': 3.2.0
+      '@automerge/automerge-repo': 2.4.0
+      eventemitter3: 5.0.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-usestateref: 1.0.9(react@18.3.1)
+    transitivePeerDependencies:
+      - supports-color
+
   '@automerge/automerge-repo-storage-indexeddb@2.2.0':
     dependencies:
       '@automerge/automerge-repo': 2.2.0
@@ -3491,13 +3517,26 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@automerge/automerge-repo@2.4.0':
+    dependencies:
+      '@automerge/automerge': 3.2.0
+      bs58check: 3.0.1
+      cbor-x: 1.6.0
+      debug: 4.4.1(supports-color@5.5.0)
+      eventemitter3: 5.0.1
+      fast-sha256: 1.3.0
+      uuid: 9.0.1
+      xstate: 5.20.2
+    transitivePeerDependencies:
+      - supports-color
+
   '@automerge/automerge@2.2.9':
     dependencies:
       uuid: 9.0.1
 
-  '@automerge/automerge@3.0.0': {}
-
   '@automerge/automerge@3.1.1': {}
+
+  '@automerge/automerge@3.2.0': {}
 
   '@automerge/react@2.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -4380,12 +4419,12 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@patchwork/sdk@file:../../patchwork/sdk(@types/react-dom@18.3.1)(@types/react@18.3.12)':
+  '@patchwork/sdk@file:../../../../patchwork/sdk(@types/react-dom@18.3.1)(@types/react@18.3.12)':
     dependencies:
-      '@automerge/automerge': 3.0.0
+      '@automerge/automerge': 3.2.0
       '@automerge/automerge-codemirror': 0.1.0
-      '@automerge/automerge-repo': 2.2.0
-      '@automerge/automerge-repo-react-hooks': 2.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@automerge/automerge-repo': 2.4.0
+      '@automerge/automerge-repo-react-hooks': 2.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@codemirror/autocomplete': 6.18.6
       '@codemirror/commands': 6.8.1
       '@codemirror/lang-markdown': 6.3.4
@@ -6969,6 +7008,8 @@ snapshots:
   yn@3.1.1: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@4.1.12: {}
 
   zrender@5.6.1:
     dependencies:

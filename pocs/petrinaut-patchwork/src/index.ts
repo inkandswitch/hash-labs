@@ -1,6 +1,6 @@
-import { DataTypeDescription, type Plugin, ToolDescription } from "@patchwork/sdk";
+import { type Plugin } from "@patchwork/sdk";
 
-export const plugins: Plugin<ToolDescription | DataTypeDescription>[] = [
+export const plugins: Plugin<any>[] = [
   {
     type: "patchwork:dataType",
     id: "petrinaut",
@@ -20,6 +20,54 @@ export const plugins: Plugin<ToolDescription | DataTypeDescription>[] = [
     async load() {
       const { Tool } = await import("./tool");
       return { EditorComponent: Tool };
+    },
+  },
+  {
+    type: "patchwork:action",
+    id: "petrinaut-add-place",
+    name: "Add Place",
+    icon: "Circle",
+    supportedDataTypes: ["petrinaut"],
+    async load() {
+      const { addPlace, addPlaceArgsSchema } = await import("./actions");
+      return { default: addPlace, argsSchema: addPlaceArgsSchema };
+    },
+  },
+  {
+    type: "patchwork:action",
+    id: "petrinaut-add-transition",
+    name: "Add Transition",
+    icon: "Square",
+    supportedDataTypes: ["petrinaut"],
+    async load() {
+      const { addTransition, addTransitionArgsSchema } = await import(
+        "./actions"
+      );
+      return { default: addTransition, argsSchema: addTransitionArgsSchema };
+    },
+  },
+  {
+    type: "patchwork:action",
+    id: "petrinaut-add-arc",
+    name: "Add Arc",
+    icon: "ArrowRight",
+    supportedDataTypes: ["petrinaut"],
+    async load() {
+      const { addArc, addArcArgsSchema } = await import("./actions");
+      return { default: addArc, argsSchema: addArcArgsSchema };
+    },
+  },
+  {
+    type: "patchwork:action",
+    id: "petrinaut-add-token-type",
+    name: "Add Token Type",
+    icon: "Palette",
+    supportedDataTypes: ["petrinaut"],
+    async load() {
+      const { addTokenType, addTokenTypeArgsSchema } = await import(
+        "./actions"
+      );
+      return { default: addTokenType, argsSchema: addTokenTypeArgsSchema };
     },
   },
 ];

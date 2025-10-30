@@ -16,7 +16,6 @@
   "author": "Ink & Switch",
   "dependencies": {
     "@automerge/automerge-repo-react-hooks": "2.0.0-alpha.22",
-    "@patchwork/sdk": "file:../../../patchwork/sdk",
     "@automerge/react": "^2.0.0",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
@@ -25,13 +24,15 @@
     "@hashintel/design-system": "0.0.9-canary.2",
     "@mui/material": "5.18.0",
     "@mui/system": "5.18.0",
+    "@patchwork/sdk": "file:../../../../patchwork/sdk",
     "elkjs": "0.10.0",
-    "reactflow": "11.11.4",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-use": "17.6.0",
+    "reactflow": "11.11.4",
     "uuid": "11.1.0",
-    "vite-plugin-wasm": "3.3.0"
+    "vite-plugin-wasm": "3.3.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.9",
