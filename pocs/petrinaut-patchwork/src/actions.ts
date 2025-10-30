@@ -72,7 +72,17 @@ export async function addPlace(
     const initialTokenCounts: Record<string, number> = {};
     for (const tokenType of tokenTypes) {
       const key = `tokens_${tokenType.id}`;
-      initialTokenCounts[tokenType.id] = args[key] || 0;
+      initialTokenCounts[tokenType.id] = args[key] ?? 0;
+    }
+
+    const data: PlaceNodeData = {
+      type: "place",
+      label: args.label,
+    };
+
+    // Only add initialTokenCounts if there are token types defined
+    if (Object.keys(initialTokenCounts).length > 0) {
+      data.initialTokenCounts = initialTokenCounts;
     }
 
     const newPlace: PlaceNodeType = {
@@ -80,11 +90,7 @@ export async function addPlace(
       type: "place",
       position: { x: args.x ?? 100, y: args.y ?? 100 },
       ...nodeDimensions.place,
-      data: {
-        type: "place",
-        label: args.label,
-        initialTokenCounts: initialTokenCounts,
-      },
+      data,
     };
 
     doc.petriNetDefinition.nodes.push(newPlace as any);
@@ -124,17 +130,25 @@ export async function addTransition(
   }
 ) {
   handle.change((doc) => {
+    const data: TransitionNodeData = {
+      type: "transition",
+      label: args.label,
+    };
+
+    // Only add optional fields if they are provided
+    if (args.delay !== undefined) {
+      data.delay = args.delay;
+    }
+    if (args.description !== undefined && args.description !== "") {
+      data.description = args.description;
+    }
+
     const newTransition: TransitionNodeType = {
       id: generateUuid(),
       type: "transition",
       position: { x: args.x ?? 100, y: args.y ?? 100 },
       ...nodeDimensions.transition,
-      data: {
-        type: "transition",
-        label: args.label,
-        delay: args.delay,
-        description: args.description,
-      },
+      data,
     };
 
     doc.petriNetDefinition.nodes.push(newTransition as any);
@@ -154,80 +168,77 @@ export const addArcArgsSchema = (doc: Doc) => {
   const placeLabels = places.map((p) => p.data.label || p.id);
   const transitionLabels = transitions.map((t) => t.data.label || t.id);
 
-  const baseSchema: Record<string, z.ZodTypeAny> = {
-    direction: z
-      .enum(["place_to_transition", "transition_to_place"])
-      .describe(
-        "Direction of the arc: from place to transition, or from transition to place"
-      ),
-  };
-
-  // Conditionally add source/target based on what's available
-  if (placeLabels.length > 0) {
-    baseSchema.source_place = z
-      .enum(placeLabels as [string, ...string[]])
+  // Build token weight schema
+  const tokenWeightSchema: Record<string, z.ZodTypeAny> = {};
+  for (const tokenType of tokenTypes) {
+    tokenWeightSchema[`weight_${tokenType.id}`] = z
+      .number()
+      .min(0)
       .optional()
-      .describe("Source place (when direction is place_to_transition)");
-    baseSchema.target_place = z
-      .enum(placeLabels as [string, ...string[]])
-      .optional()
-      .describe("Target place (when direction is transition_to_place)");
-  } else {
-    baseSchema.source_place = z
-      .string()
-      .optional()
-      .describe("Source place (no places available yet)");
-    baseSchema.target_place = z
-      .string()
-      .optional()
-      .describe("Target place (no places available yet)");
+      .describe(`Weight for ${tokenType.name} tokens (defaults to 0)`);
   }
 
-  if (transitionLabels.length > 0) {
-    baseSchema.target_transition = z
-      .enum(transitionLabels as [string, ...string[]])
-      .optional()
-      .describe("Target transition (when direction is place_to_transition)");
-    baseSchema.source_transition = z
-      .enum(transitionLabels as [string, ...string[]])
-      .optional()
-      .describe("Source transition (when direction is transition_to_place)");
-  } else {
-    baseSchema.target_transition = z
-      .string()
-      .optional()
-      .describe("Target transition (no transitions available yet)");
-    baseSchema.source_transition = z
-      .string()
-      .optional()
-      .describe("Source transition (no transitions available yet)");
-  }
+  // Schema for place -> transition arcs
+  const placeToTransitionSchema = z.object({
+    direction: z.literal("place_to_transition"),
+    source_place:
+      placeLabels.length > 0
+        ? z.enum(placeLabels as [string, ...string[]]).describe("Source place")
+        : z.string().describe("Source place (no places available yet)"),
+    target_transition:
+      transitionLabels.length > 0
+        ? z
+            .enum(transitionLabels as [string, ...string[]])
+            .describe("Target transition")
+        : z
+            .string()
+            .describe("Target transition (no transitions available yet)"),
+    ...tokenWeightSchema,
+  });
 
-  // Add token weight fields for each token type
-  if (tokenTypes.length > 0) {
-    for (const tokenType of tokenTypes) {
-      baseSchema[`weight_${tokenType.id}`] = z
-        .number()
-        .min(0)
-        .optional()
-        .describe(`Weight for ${tokenType.name} tokens (defaults to 0)`);
-    }
-  }
+  // Schema for transition -> place arcs
+  const transitionToPlaceSchema = z.object({
+    direction: z.literal("transition_to_place"),
+    source_transition:
+      transitionLabels.length > 0
+        ? z
+            .enum(transitionLabels as [string, ...string[]])
+            .describe("Source transition")
+        : z
+            .string()
+            .describe("Source transition (no transitions available yet)"),
+    target_place:
+      placeLabels.length > 0
+        ? z.enum(placeLabels as [string, ...string[]]).describe("Target place")
+        : z.string().describe("Target place (no places available yet)"),
+    ...tokenWeightSchema,
+  });
 
-  return z.object(baseSchema);
+  // Return discriminated union based on direction
+  return z.discriminatedUnion("direction", [
+    placeToTransitionSchema,
+    transitionToPlaceSchema,
+  ]);
 };
+
+type AddArcArgs =
+  | {
+      direction: "place_to_transition";
+      source_place: string;
+      target_transition: string;
+      [key: string]: any;
+    }
+  | {
+      direction: "transition_to_place";
+      source_transition: string;
+      target_place: string;
+      [key: string]: any;
+    };
 
 export async function addArc(
   handle: DocHandle<Doc>,
   _repo: Repo,
-  args: {
-    direction: "place_to_transition" | "transition_to_place";
-    source_place?: string;
-    target_place?: string;
-    source_transition?: string;
-    target_transition?: string;
-    [key: string]: any;
-  }
+  args: AddArcArgs
 ) {
   handle.change((doc) => {
     const places = getPlaces(doc);
@@ -235,8 +246,8 @@ export async function addArc(
     const tokenTypes = getTokenTypes(doc);
 
     // Find source and target based on direction
-    let sourceId: string | undefined;
-    let targetId: string | undefined;
+    let sourceId: string;
+    let targetId: string;
 
     if (args.direction === "place_to_transition") {
       // Source is a place, target is a transition
@@ -284,7 +295,7 @@ export async function addArc(
     const tokenWeights: Record<string, number> = {};
     for (const tokenType of tokenTypes) {
       const key = `weight_${tokenType.id}`;
-      tokenWeights[tokenType.id] = args[key] || 0;
+      tokenWeights[tokenType.id] = args[key] ?? 0;
     }
 
     const newArc = {
@@ -333,16 +344,21 @@ export async function addTokenType(
     // Initialize this token type in all existing places' initialTokenCounts
     const places = getPlaces(doc);
     for (const place of places) {
-      if (place.data.initialTokenCounts) {
-        place.data.initialTokenCounts[newTokenType.id] = 0;
+      if (!place.data.initialTokenCounts) {
+        place.data.initialTokenCounts = {};
       }
+      place.data.initialTokenCounts[newTokenType.id] = 0;
     }
 
     // Initialize this token type in all existing arcs' tokenWeights
     for (const arc of doc.petriNetDefinition.arcs) {
-      if (arc.data?.tokenWeights) {
-        arc.data.tokenWeights[newTokenType.id] = 0;
+      if (!arc.data) {
+        arc.data = { tokenWeights: {} };
       }
+      if (!arc.data.tokenWeights) {
+        arc.data.tokenWeights = {};
+      }
+      arc.data.tokenWeights[newTokenType.id] = 0;
     }
   });
 }
