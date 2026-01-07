@@ -71,16 +71,6 @@
     eventemitter3 "^5.0.1"
     react-usestateref "^1.0.8"
 
-"@automerge/automerge-repo-react-hooks@2.5.0-alpha.2":
-  version "2.5.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/@automerge/automerge-repo-react-hooks/-/automerge-repo-react-hooks-2.5.0-alpha.2.tgz#7a81b0e0918b66fed09e1d9e40ab0b5285c3af43"
-  integrity sha512-1VAkWHGeKr1y43uqwqBeewL7NK0amERw/3vm4aLDmYx5oAn7w2c+cPc+HBu4m+VTaYDquTLQaaQvo6TFs+wHCg==
-  dependencies:
-    "@automerge/automerge" "2.2.8 - 3"
-    "@automerge/automerge-repo" "2.5.0-alpha.2"
-    eventemitter3 "^5.0.1"
-    react-usestateref "^1.0.8"
-
 "@automerge/automerge-repo-storage-indexeddb@2.5.0":
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/@automerge/automerge-repo-storage-indexeddb/-/automerge-repo-storage-indexeddb-2.5.0.tgz#fe54553f4cb451ac90cc2ea01244f143c5a60f3b"
