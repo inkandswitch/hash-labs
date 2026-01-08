@@ -1,5 +1,5 @@
 {
-  "name": "@patchwork/petrinaut",
+  "name": "@gaios/petrinaut",
   "version": "0.0.1",
   "description": "Petrinaut – Petri Net editor",
   "type": "module",
