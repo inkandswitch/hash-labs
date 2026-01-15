@@ -1,18 +1,35 @@
+import { annotations } from "@inkandswitch/annotations-context";
+import { Diff } from "@inkandswitch/annotations-diff";
+import { ref, type Ref } from "@inkandswitch/patchwork-refs";
+import { useSubscribe } from "@inkandswitch/subscribables-react";
 import { IconButton, IconDiagramRegular } from "@hashintel/design-system";
 import { Box, Tooltip, Typography } from "@mui/material";
+import { useMemo } from "react";
 import { Handle, type NodeProps, Position } from "reactflow";
 
 import { useEditorContext } from "./editor-context";
 import { handleStyling, transitionStyling } from "./styling";
 import type { TransitionNodeData } from "./types";
 
-export const TransitionNode = ({
-  data,
-  isConnectable,
-}: NodeProps<TransitionNodeData>) => {
+console.log("latest version 2");
+
+export const TransitionNode = ({ data, id, isConnectable }: NodeProps<TransitionNodeData>) => {
   const { label, description, childNet } = data;
 
-  const { loadPetriNet } = useEditorContext();
+  const { docHandle, loadPetriNet } = useEditorContext();
+
+  // Create a ref to this node for annotation lookup
+  const nodeRef = useMemo(() => {
+    if (!docHandle) return null;
+    return ref(docHandle, "petriNetDefinition", "nodes", { id }) as Ref;
+  }, [docHandle, id]);
+
+  // Query diff annotations reactively
+  const nodeAnnotations = useSubscribe(nodeRef ? annotations.onRef(nodeRef) : undefined);
+  const diffType = nodeAnnotations?.lookup(Diff)?.type;
+
+  // Diff styling - green for added, amber for changed
+  const diffBorderColor = diffType === "added" ? "#22c55e" : diffType === "changed" ? "#f59e0b" : undefined;
 
   return (
     <div
@@ -21,13 +38,16 @@ export const TransitionNode = ({
         background: "transparent",
       }}
     >
-      <Handle
-        type="target"
-        position={Position.Left}
-        isConnectable={isConnectable}
-        style={handleStyling}
-      />
-      <Box sx={transitionStyling}>
+      <Handle type="target" position={Position.Left} isConnectable={isConnectable} style={handleStyling} />
+      <Box
+        sx={(theme) => ({
+          ...transitionStyling(theme),
+          ...(diffBorderColor && {
+            border: `3px solid ${diffBorderColor}`,
+            boxShadow: `0 0 8px ${diffBorderColor}40`,
+          }),
+        })}
+      >
         {childNet && (
           <Tooltip title={`Switch to child net ${childNet.childNetTitle}`}>
             <IconButton
@@ -68,12 +88,7 @@ export const TransitionNode = ({
           </Typography>
         )}
       </Box>
-      <Handle
-        type="source"
-        position={Position.Right}
-        isConnectable={isConnectable}
-        style={handleStyling}
-      />
+      <Handle type="source" position={Position.Right} isConnectable={isConnectable} style={handleStyling} />
     </div>
   );
 };

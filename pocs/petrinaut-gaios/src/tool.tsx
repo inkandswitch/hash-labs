@@ -22,6 +22,7 @@ export const PetrinautEditor = ({ docUrl }: { docUrl: AutomergeUrl; element: Too
         <CssBaseline />
         <Petrinaut
           key={docUrl}
+          docHandle={docHandle}
           hideNetManagementControls
           petriNetId={docUrl}
           petriNetDefinition={doc.petriNetDefinition}

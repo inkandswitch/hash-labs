@@ -1,27 +1,14 @@
-import {
-  createContext,
-  type Dispatch,
-  type SetStateAction,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
+import type { DocHandle } from "@automerge/automerge-repo";
+import { createContext, type Dispatch, type SetStateAction, useContext, useMemo, useState } from "react";
 
-import type {
-  MinimalNetMetadata,
-  ParentNet,
-  PetriNetDefinitionObject,
-} from "./types";
+import type { Doc } from "../../../datatype";
+import type { MinimalNetMetadata, ParentNet, PetriNetDefinitionObject } from "./types";
 
-export type MutatePetriNetDefinition = (
-  mutationFn: (petriNetDefinition: PetriNetDefinitionObject) => undefined,
-) => void;
+export type MutatePetriNetDefinition = (mutationFn: (petriNetDefinition: PetriNetDefinitionObject) => undefined) => void;
 
 type EditorContextValue = {
-  createNewNet: (params: {
-    petriNetDefinition: PetriNetDefinitionObject;
-    title: string;
-  }) => void;
+  createNewNet: (params: { petriNetDefinition: PetriNetDefinitionObject; title: string }) => void;
+  docHandle: DocHandle<Doc> | null;
   existingNets: MinimalNetMetadata[];
   loadPetriNet: (petriNetId: string) => void;
   parentNet: ParentNet | null;
@@ -38,10 +25,8 @@ const EditorContext = createContext<EditorContextValue | undefined>(undefined);
 
 type EditorContextProviderProps = {
   children: React.ReactNode;
-  createNewNet: (params: {
-    petriNetDefinition: PetriNetDefinitionObject;
-    title: string;
-  }) => void;
+  createNewNet: (params: { petriNetDefinition: PetriNetDefinitionObject; title: string }) => void;
+  docHandle: DocHandle<Doc> | null;
   existingNets: MinimalNetMetadata[];
   parentNet: ParentNet | null;
   petriNetId: string | null;
@@ -53,26 +38,13 @@ type EditorContextProviderProps = {
   title: string;
 };
 
-export const EditorContextProvider = ({
-  children,
-  createNewNet,
-  existingNets,
-  parentNet: parentNetFromProps,
-  petriNetId,
-  petriNetDefinition,
-  readonly,
-  loadPetriNet,
-  mutatePetriNetDefinition,
-  setTitle,
-  title,
-}: EditorContextProviderProps) => {
-  const [parentNet, setParentNet] = useState<ParentNet | null>(
-    parentNetFromProps,
-  );
+export const EditorContextProvider = ({ children, createNewNet, docHandle, existingNets, parentNet: parentNetFromProps, petriNetId, petriNetDefinition, readonly, loadPetriNet, mutatePetriNetDefinition, setTitle, title }: EditorContextProviderProps) => {
+  const [parentNet, setParentNet] = useState<ParentNet | null>(parentNetFromProps);
 
   const value: EditorContextValue = useMemo(
     () => ({
       createNewNet,
+      docHandle,
       existingNets,
       loadPetriNet,
       parentNet,
@@ -84,33 +56,17 @@ export const EditorContextProvider = ({
       setTitle,
       title,
     }),
-    [
-      createNewNet,
-      existingNets,
-      loadPetriNet,
-      mutatePetriNetDefinition,
-      parentNet,
-      petriNetId,
-      petriNetDefinition,
-      readonly,
-      setParentNet,
-      setTitle,
-      title,
-    ],
+    [createNewNet, docHandle, existingNets, loadPetriNet, mutatePetriNetDefinition, parentNet, petriNetId, petriNetDefinition, readonly, setParentNet, setTitle, title]
   );
 
-  return (
-    <EditorContext.Provider value={value}>{children}</EditorContext.Provider>
-  );
+  return <EditorContext.Provider value={value}>{children}</EditorContext.Provider>;
 };
 
 export const useEditorContext = () => {
   const context = useContext(EditorContext);
 
   if (!context) {
-    throw new Error(
-      "useEditorContext must be used within an EditorContextProvider",
-    );
+    throw new Error("useEditorContext must be used within an EditorContextProvider");
   }
 
   return context;

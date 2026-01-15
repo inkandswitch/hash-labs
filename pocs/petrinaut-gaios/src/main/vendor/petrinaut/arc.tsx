@@ -1,4 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { annotations } from "@inkandswitch/annotations-context";
+import { Diff } from "@inkandswitch/annotations-diff";
+import { ref, type Ref } from "@inkandswitch/patchwork-refs";
+import { useSubscribe } from "@inkandswitch/subscribables-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getBezierPath, type Position } from "reactflow";
 
 import { useEditorContext } from "./editor-context";
@@ -34,9 +38,22 @@ export const Arc = ({
 		};
 	};
 }) => {
-	const { petriNetDefinition } = useEditorContext();
+	const { docHandle, petriNetDefinition } = useEditorContext();
 
 	const { simulationSpeed } = useSimulationContext();
+
+	// Create a ref to this arc for annotation lookup
+	const arcRef = useMemo(() => {
+		if (!docHandle) return null;
+		return ref(docHandle, "petriNetDefinition", "arcs", { id }) as Ref;
+	}, [docHandle, id]);
+
+	// Query diff annotations reactively
+	const arcAnnotations = useSubscribe(arcRef ? annotations.onRef(arcRef) : undefined);
+	const diffType = arcAnnotations?.lookup(Diff)?.type;
+
+	// Diff styling - green for added, amber for changed
+	const diffStrokeColor = diffType === "added" ? "#22c55e" : diffType === "changed" ? "#f59e0b" : "#555";
 
 	const [animatingTokens, setAnimatingTokens] = useState<AnimatingToken[]>([]);
 	const [arcPath, labelX, labelY] = getBezierPath({
@@ -88,13 +105,27 @@ export const Arc = ({
 
 	return (
 		<>
+			{/* Glow effect for diff-highlighted arcs */}
+			{diffType && (
+				<path
+					d={arcPath}
+					fill="none"
+					strokeWidth={8}
+					stroke={diffStrokeColor}
+					style={{
+						pointerEvents: "none",
+						opacity: 0.3,
+						filter: "blur(2px)",
+					}}
+				/>
+			)}
 			<path
 				id={id}
 				className="react-flow__edge-path"
 				d={arcPath}
 				fill="none"
 				strokeWidth={20}
-				stroke="#555"
+				stroke={diffStrokeColor}
 				style={{
 					cursor: "pointer",
 					strokeOpacity: 0.1,
@@ -105,8 +136,8 @@ export const Arc = ({
 				className="react-flow__edge-path"
 				d={arcPath}
 				fill="none"
-				strokeWidth={2}
-				stroke="#555"
+				strokeWidth={diffType ? 3 : 2}
+				stroke={diffStrokeColor}
 				style={{ pointerEvents: "none" }}
 			/>
 			{animatingTokens.map((token) => {
