@@ -576,25 +576,27 @@ export type PetrinautProps = {
 
 export const Petrinaut = ({ createNewNet, docHandle, existingNets, hideNetManagementControls, parentNet, petriNetId, petriNetDefinition, mutatePetriNetDefinition, loadPetriNet, setTitle, title }: PetrinautProps) => {
   return (
-    <ReactFlowProvider>
-      <EditorContextProvider
-        createNewNet={createNewNet}
-        docHandle={docHandle}
-        existingNets={existingNets}
-        parentNet={parentNet}
-        petriNetId={petriNetId}
-        petriNetDefinition={petriNetDefinition}
-        mutatePetriNetDefinition={mutatePetriNetDefinition}
-        loadPetriNet={loadPetriNet}
-        // @todo add readonly prop and turn off editing everything when true
-        readonly={false}
-        setTitle={setTitle}
-        title={title}
-      >
-        <SimulationContextProvider>
-          <PetrinautInner hideNetManagementControls={hideNetManagementControls} />
-        </SimulationContextProvider>
-      </EditorContextProvider>
-    </ReactFlowProvider>
+    <div className="gaios-petrinaut" style={{ height: "100%" }}>
+      <ReactFlowProvider>
+        <EditorContextProvider
+          createNewNet={createNewNet}
+          docHandle={docHandle}
+          existingNets={existingNets}
+          parentNet={parentNet}
+          petriNetId={petriNetId}
+          petriNetDefinition={petriNetDefinition}
+          mutatePetriNetDefinition={mutatePetriNetDefinition}
+          loadPetriNet={loadPetriNet}
+          // @todo add readonly prop and turn off editing everything when true
+          readonly={false}
+          setTitle={setTitle}
+          title={title}
+        >
+          <SimulationContextProvider>
+            <PetrinautInner hideNetManagementControls={hideNetManagementControls} />
+          </SimulationContextProvider>
+        </EditorContextProvider>
+      </ReactFlowProvider>
+    </div>
   );
 };

@@ -11,8 +11,6 @@ import { useEditorContext } from "./editor-context";
 import { handleStyling, transitionStyling } from "./styling";
 import type { TransitionNodeData } from "./types";
 
-console.log("latest version 2");
-
 export const TransitionNode = ({ data, id, isConnectable }: NodeProps<TransitionNodeData>) => {
   const { label, description, childNet } = data;
 
@@ -21,7 +19,8 @@ export const TransitionNode = ({ data, id, isConnectable }: NodeProps<Transition
   // Create a ref to this node for annotation lookup
   const nodeRef = useMemo(() => {
     if (!docHandle) return null;
-    return ref(docHandle, "petriNetDefinition", "nodes", { id }) as Ref;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return ref(docHandle as any, "petriNetDefinition", "nodes", { id }) as Ref;
   }, [docHandle, id]);
 
   // Query diff annotations reactively

@@ -4,7 +4,7 @@ import { CacheProvider } from "@emotion/react";
 import { createEmotionCache, theme } from "@hashintel/design-system/theme";
 import type { ToolElement } from "@inkandswitch/patchwork-plugins";
 import { toolify } from "@inkandswitch/patchwork-react";
-import { CssBaseline, ThemeProvider } from "@mui/material";
+import { ScopedCssBaseline, ThemeProvider } from "@mui/material";
 import { Doc } from "./datatype";
 import { Petrinaut } from "./main/vendor/petrinaut";
 
@@ -19,31 +19,32 @@ export const PetrinautEditor = ({ docUrl }: { docUrl: AutomergeUrl; element: Too
   return (
     <CacheProvider value={emotionCache}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Petrinaut
-          key={docUrl}
-          docHandle={docHandle}
-          hideNetManagementControls
-          petriNetId={docUrl}
-          petriNetDefinition={doc.petriNetDefinition}
-          existingNets={[]}
-          mutatePetriNetDefinition={(mutationFn) => {
-            changeDoc((d) => {
-              mutationFn(d.petriNetDefinition);
-            });
-          }}
-          parentNet={null}
-          createNewNet={() => {
-            throw new Error("Creation not supported via Patchwork wrapper");
-          }}
-          loadPetriNet={() => {
-            throw new Error("Loading other nets not supported via Patchwork wrapper");
-          }}
-          setTitle={() => {
-            throw new Error("setTitle handled by Patchwork data type");
-          }}
-          title={""}
-        />
+        <ScopedCssBaseline sx={{ height: "100%" }}>
+          <Petrinaut
+            key={docUrl}
+            docHandle={docHandle}
+            hideNetManagementControls
+            petriNetId={docUrl}
+            petriNetDefinition={doc.petriNetDefinition}
+            existingNets={[]}
+            mutatePetriNetDefinition={(mutationFn) => {
+              changeDoc((d) => {
+                mutationFn(d.petriNetDefinition);
+              });
+            }}
+            parentNet={null}
+            createNewNet={() => {
+              throw new Error("Creation not supported via Patchwork wrapper");
+            }}
+            loadPetriNet={() => {
+              throw new Error("Loading other nets not supported via Patchwork wrapper");
+            }}
+            setTitle={() => {
+              throw new Error("setTitle handled by Patchwork data type");
+            }}
+            title={""}
+          />
+        </ScopedCssBaseline>
       </ThemeProvider>
     </CacheProvider>
   );

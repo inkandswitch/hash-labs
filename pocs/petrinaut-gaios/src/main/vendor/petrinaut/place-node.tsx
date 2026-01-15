@@ -36,7 +36,8 @@ export const PlaceNode = ({ data, id, isConnectable }: NodeProps<PlaceNodeData>)
   // Create a ref to this node for annotation lookup
   const nodeRef = useMemo(() => {
     if (!docHandle) return null;
-    return ref(docHandle, "petriNetDefinition", "nodes", { id }) as Ref;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return ref(docHandle as any, "petriNetDefinition", "nodes", { id }) as Ref;
   }, [docHandle, id]);
 
   // Query diff annotations reactively
