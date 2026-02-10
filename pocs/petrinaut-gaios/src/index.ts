@@ -22,4 +22,15 @@ export const plugins: Plugin<any>[] = [
       return renderPetrinautEditor;
     },
   },
+  {
+    type: "patchwork:tool",
+    id: "annotations-example",
+    name: "Annotations Example",
+    icon: "Code",
+    supportedDatatypes: "*",
+    async load() {
+      const { renderAnnotationsExampleTool } = await import("./annotations-example-tool");
+      return renderAnnotationsExampleTool;
+    },
+  },
 ];

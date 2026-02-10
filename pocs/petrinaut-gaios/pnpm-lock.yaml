@@ -4,18 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  react: ^18.3.1
-  react-dom: ^18.3.1
-  '@inkandswitch/annotations': link:../../../patchwork-next/packages/annotations/core
-  '@inkandswitch/annotations-context': link:../../../patchwork-next/packages/annotations/context
-  '@inkandswitch/annotations-comments': link:../../../patchwork-next/packages/annotations/annotation-types/comments
-  '@inkandswitch/annotations-diff': link:../../../patchwork-next/packages/annotations/annotation-types/diff
-  '@inkandswitch/annotations-selection': link:.././../patchwork-next/packages/annotations/annotation-types/selection
-  '@inkandswitch/patchwork-refs': link:../../../patchwork-next/packages/refs
-  '@inkandswitch/subscribables': link:../../../patchwork-next/packages/subscribables/core
-  '@inkandswitch/subscribables-react': link:../../../patchwork-next/packages/subscribables/frameworks/react
-
 importers:
 
   .:
@@ -24,8 +12,8 @@ importers:
         specifier: 3.2.1
         version: 3.2.1
       '@automerge/automerge-repo':
-        specifier: 2.5.0
-        version: 2.5.0
+        specifier: 2.5.2-alpha.0
+        version: 2.5.2-alpha.0
       '@automerge/automerge-repo-keyhive':
         specifier: 0.0.0-alpha.71
         version: 0.0.0-alpha.71
@@ -54,32 +42,32 @@ importers:
         specifier: 0.0.9-canary.2
         version: 0.0.9-canary.2(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@18.3.27)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.27)(react@18.3.1))(@types/react@18.3.27)(react@18.3.1))(@mui/material@5.18.0(@emotion/react@11.14.0(@types/react@18.3.27)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.27)(react@18.3.1))(@types/react@18.3.27)(react@18.3.1))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mui/system@5.18.0(@emotion/react@11.14.0(@types/react@18.3.27)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.27)(react@18.3.1))(@types/react@18.3.27)(react@18.3.1))(@types/react@18.3.27)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@inkandswitch/annotations':
-        specifier: link:../../../patchwork-next/packages/annotations/core
-        version: link:../../../patchwork-next/packages/annotations/core
+        specifier: 0.1.4
+        version: 0.1.4
       '@inkandswitch/annotations-context':
-        specifier: link:../../../patchwork-next/packages/annotations/context
-        version: link:../../../patchwork-next/packages/annotations/context
+        specifier: 0.1.4
+        version: 0.1.4
       '@inkandswitch/annotations-diff':
-        specifier: link:../../../patchwork-next/packages/annotations/annotation-types/diff
-        version: link:../../../patchwork-next/packages/annotations/annotation-types/diff
+        specifier: 0.1.4
+        version: 0.1.4
       '@inkandswitch/patchwork-bootloader':
         specifier: 0.0.4
-        version: 0.0.4(@automerge/automerge-repo-keyhive@0.0.0-alpha.71)(@automerge/automerge-repo@2.5.0)(@automerge/automerge@3.2.1)(@automerge/vanillajs@2.5.0)(@keyhive/keyhive@0.0.0-alpha.40)
+        version: 0.0.4(@automerge/automerge-repo-keyhive@0.0.0-alpha.71)(@automerge/automerge-repo@2.5.2-alpha.0)(@automerge/automerge@3.2.1)(@automerge/vanillajs@2.5.0)(@keyhive/keyhive@0.0.0-alpha.40)
       '@inkandswitch/patchwork-plugins':
         specifier: 0.0.4
         version: 0.0.4
       '@inkandswitch/patchwork-react':
-        specifier: ^0.0.1
+        specifier: 0.0.1
         version: 0.0.1
       '@inkandswitch/patchwork-refs':
-        specifier: link:../../../patchwork-next/packages/refs
-        version: link:../../../patchwork-next/packages/refs
+        specifier: 0.1.3
+        version: 0.1.3
       '@inkandswitch/subscribables':
-        specifier: link:../../../patchwork-next/packages/subscribables/core
-        version: link:../../../patchwork-next/packages/subscribables/core
+        specifier: 0.1.2
+        version: 0.1.2
       '@inkandswitch/subscribables-react':
-        specifier: link:../../../patchwork-next/packages/subscribables/frameworks/react
-        version: link:../../../patchwork-next/packages/subscribables/frameworks/react
+        specifier: 0.1.2
+        version: 0.1.2(react@18.3.1)
       '@keyhive/keyhive':
         specifier: 0.0.0-alpha.40
         version: 0.0.0-alpha.40
@@ -96,10 +84,10 @@ importers:
         specifier: ^15.5.4
         version: 15.8.1
       react:
-        specifier: ^18.3.1
+        specifier: ^18.0.0
         version: 18.3.1
       react-dom:
-        specifier: ^18.3.1
+        specifier: ^18.0.0
         version: 18.3.1(react@18.3.1)
       react-use:
         specifier: 17.6.0
@@ -181,8 +169,8 @@ packages:
   '@automerge/automerge-repo-react-hooks@2.5.0':
     resolution: {integrity: sha512-SToH6koaQ/sRB8m5gnP6F+QXAKTIEHwQp7aq7Dy3EzLx3CNMlyaQ3fAVCW+vdf9zWfuoEUrm3KZCk7i3wzICUw==}
     peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
 
   '@automerge/automerge-repo-storage-indexeddb@2.5.0':
     resolution: {integrity: sha512-7MJYJ5S6K7dHlbvs5/u/v9iexqOeprU/qQonup28r2IoVqwzjuN5ezaoVk6JRBMDI/ZxWfU4rNrqVrVlB49yXA==}
@@ -192,6 +180,9 @@ packages:
 
   '@automerge/automerge-repo@2.5.0-alpha.2':
     resolution: {integrity: sha512-Sjl1CaD4IpmboNIG9/EL9Run+AKrL8/1h3Om1NZp9syBnJN8OWjeG4ttpQce6k8HdPyl8sllAHYy8/Q4Ukh39w==}
+
+  '@automerge/automerge-repo@2.5.2-alpha.0':
+    resolution: {integrity: sha512-Q30SZRTlCaXj///S7Kx5+hSepJ1afcvjfrC9d0o0qXLwuVJ3+UL6UQgSFS12c8b5y9bInCh6+Po5pFYx09j/Dw==}
 
   '@automerge/automerge@3.2.1':
     resolution: {integrity: sha512-xsEZlZe8lWyVCbD7Z7roH4X6ZKlRxMmmumb0M5CuxJWptUEfYsf+1z9lFEJh4aDBbWTLAgxsXd+TBi6jKTj0+g==}
@@ -289,12 +280,12 @@ packages:
   '@blockprotocol/core@0.1.4':
     resolution: {integrity: sha512-A5UAXPlzQSE8OrNAr4xWB6vX1CQI8b6P+Yv60AXu2PGAB0yTXtHGZ+OqUIE1a+ujeKkBAQ4VbH/Ys7Ycr6Bz7w==}
     peerDependencies:
-      react: ^18.3.1
+      react: ^19.0.0
 
   '@blockprotocol/graph@0.4.0-canary.2':
     resolution: {integrity: sha512-45PDPovAG1dDGjB2nR3uW7CNr7Wk8NyHdZhN9B7T+yBou9X7n/5FHvmAlj8TKxGoVW/EncUVgFVDgB74Cqd6eQ==}
     peerDependencies:
-      react: ^18.3.1
+      react: ^19.0.0
 
   '@blockprotocol/type-system@0.1.2-canary.1':
     resolution: {integrity: sha512-KKPBlaJEov1NjIHrB7zVlSmPszq6pa0STSxYtZTZGz2hVf8bRYuyOTJUhhA5fTxE7e6DkzPwJoTSmfztpVbU+g==}
@@ -348,7 +339,7 @@ packages:
     resolution: {integrity: sha512-O000MLDBDdk/EohJPFUqvnp4qnHeYkVP5B0xEG0D/L7cOKP9kefu2DXn8dj74cQfsEzUqh+sr1RzFqiL1o+PpA==}
     peerDependencies:
       '@types/react': '*'
-      react: ^18.3.1
+      react: '>=16.8.0'
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -364,7 +355,7 @@ packages:
     peerDependencies:
       '@emotion/react': ^11.0.0-rc.0
       '@types/react': '*'
-      react: ^18.3.1
+      react: '>=16.8.0'
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -375,7 +366,7 @@ packages:
   '@emotion/use-insertion-effect-with-fallbacks@1.2.0':
     resolution: {integrity: sha512-yJMtVdH59sxi/aVJBpk9FQq+OR8ll5GT8oWd57UpeaKEVGab41JWaCFA7FRLoMLloOZF/c/wsPoe+bfGmRKgDg==}
     peerDependencies:
-      react: ^18.3.1
+      react: '>=16.8.0'
 
   '@emotion/utils@1.4.2':
     resolution: {integrity: sha512-3vLclRofFziIa3J2wDh9jjbkUz9qk5Vi3IZ/FSTKViB0k+ef0fPV7dYrUIugbgupYDx7v9ud/SjrtEP8Y4xLoA==}
@@ -576,8 +567,8 @@ packages:
       '@emotion/styled': 11.14.1
       '@mui/material': 5.18.0
       '@mui/system': 5.18.0
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: ^19.0.0
+      react-dom: ^19.0.0
 
   '@hashintel/design-system@0.0.9-canary.2':
     resolution: {integrity: sha512-RjRJXDLp/4Ek260nsE+LDfawDih+vvNNoKdQqDK+7W7Ar/ysGvFe7L2qB17czGgmnNXh4uzixH43I38QSQWppg==}
@@ -587,8 +578,8 @@ packages:
       '@emotion/styled': ^11.14.0
       '@mui/material': ^5.18.0
       '@mui/system': ^5.18.0
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: ^19.0.0
+      react-dom: ^19.0.0
 
   '@humanwhocodes/config-array@0.13.0':
     resolution: {integrity: sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw==}
@@ -602,6 +593,15 @@ packages:
   '@humanwhocodes/object-schema@2.0.3':
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     deprecated: Use @eslint/object-schema instead
+
+  '@inkandswitch/annotations-context@0.1.4':
+    resolution: {integrity: sha512-dvv4JwHufm4gzvz9e60wZA1MKQCPbjolRBH6ipJNZeH+6kZyPnySy4x4DM8zMPkDsv6lBHCwLKptHh+KmTqkxw==}
+
+  '@inkandswitch/annotations-diff@0.1.4':
+    resolution: {integrity: sha512-8n+zdl/k/xRbAlx2hZ7u2jncvjtxVJiMvcfQOy2FX6fjIpXW/1Z07+v9kDxzrWlAZnFHes84xLZwKTSwpa6nmw==}
+
+  '@inkandswitch/annotations@0.1.4':
+    resolution: {integrity: sha512-7jVuIaheFo9AIo1yDwcyLrcrJXtCYsaDPa73KbzORMWQsET3q2mKP9l6PeTU81nwC0kRIkwmjyglASeObzrKrw==}
 
   '@inkandswitch/patchwork-bootloader@0.0.4':
     resolution: {integrity: sha512-3VWkDYPTiY4H2+877tYHptRGQcCg22uoa0NG+7cgwbmETcBhnXheoLh/cv3clPf2mcMiglhY1Htt7ezkgKa17g==}
@@ -623,6 +623,17 @@ packages:
 
   '@inkandswitch/patchwork-react@0.0.1':
     resolution: {integrity: sha512-+LAHA53WVKpqnrrIkP1RBnBxbP/atTO4tev+6a6TeHAqMpRoHRWXlNWcIsPtpMgeAD0P8liGLh0gcdb+F9wTrg==}
+
+  '@inkandswitch/patchwork-refs@0.1.3':
+    resolution: {integrity: sha512-obWR/dIWu3pja6u6jLnHw3rJxApSZ7mWwf5PaknH2lckxRgEOeNxG5Zp76mPx/1jiqxZAgV20ZlHKhoK/A2BDw==}
+
+  '@inkandswitch/subscribables-react@0.1.2':
+    resolution: {integrity: sha512-STNlvQ+3+wGnXDCIe5QzBKSchJMViI2rc+qWfr1RY0k4ahdzEql1leKM4jCDBt+e0UkE6X+zAmEVjm0g+A32zA==}
+    peerDependencies:
+      react: ^18.0.0
+
+  '@inkandswitch/subscribables@0.1.2':
+    resolution: {integrity: sha512-z6emWk5LuSPDbKJGzM8oB4D764CfLwGD292FRT/QNo6N8e9lsUJHtL6KzDvJmAk5bGwCrrZ1r7zifnVwNTlsAg==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -662,8 +673,8 @@ packages:
       '@emotion/react': ^11.5.0
       '@emotion/styled': ^11.3.0
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@emotion/react':
         optional: true
@@ -677,7 +688,7 @@ packages:
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
-      react: ^18.3.1
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -688,7 +699,7 @@ packages:
     peerDependencies:
       '@emotion/react': ^11.4.1
       '@emotion/styled': ^11.3.0
-      react: ^18.3.1
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@emotion/react':
         optional: true
@@ -702,7 +713,7 @@ packages:
       '@emotion/react': ^11.5.0
       '@emotion/styled': ^11.3.0
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
-      react: ^18.3.1
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@emotion/react':
         optional: true
@@ -724,7 +735,7 @@ packages:
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
-      react: ^18.3.1
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -751,38 +762,38 @@ packages:
   '@reactflow/background@11.3.14':
     resolution: {integrity: sha512-Gewd7blEVT5Lh6jqrvOgd4G6Qk17eGKQfsDXgyRSqM+CTwDqRldG2LsWN4sNeno6sbqVIC2fZ+rAUBFA9ZEUDA==}
     peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: '>=17'
+      react-dom: '>=17'
 
   '@reactflow/controls@11.2.14':
     resolution: {integrity: sha512-MiJp5VldFD7FrqaBNIrQ85dxChrG6ivuZ+dcFhPQUwOK3HfYgX2RHdBua+gx+40p5Vw5It3dVNp/my4Z3jF0dw==}
     peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: '>=17'
+      react-dom: '>=17'
 
   '@reactflow/core@11.11.4':
     resolution: {integrity: sha512-H4vODklsjAq3AMq6Np4LE12i1I4Ta9PrDHuBR9GmL8uzTt2l2jh4CiQbEMpvMDcp7xi4be0hgXj+Ysodde/i7Q==}
     peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: '>=17'
+      react-dom: '>=17'
 
   '@reactflow/minimap@11.7.14':
     resolution: {integrity: sha512-mpwLKKrEAofgFJdkhwR5UQ1JYWlcAAL/ZU/bctBkuNTT1yqV+y0buoNVImsRehVYhJwffSWeSHaBR5/GJjlCSQ==}
     peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: '>=17'
+      react-dom: '>=17'
 
   '@reactflow/node-resizer@2.2.14':
     resolution: {integrity: sha512-fwqnks83jUlYr6OHcdFEedumWKChTHRGw/kbCxj0oqBd+ekfs+SIp4ddyNU0pdx96JIm5iNFS0oNrmEiJbbSaA==}
     peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: '>=17'
+      react-dom: '>=17'
 
   '@reactflow/node-toolbar@1.3.14':
     resolution: {integrity: sha512-rbynXQnH/xFNu4P9H+hVqlEUafDCkEoCy0Dg9mG22Sg+rY/0ck6KkrAQrYrTgXusd+cEJOMK0uOOFCK2/5rSGQ==}
     peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: '>=17'
+      react-dom: '>=17'
 
   '@rollup/plugin-virtual@3.0.2':
     resolution: {integrity: sha512-10monEYsBp3scM4/ND4LNH5Rxvh3e/cVeL3jWTgZ2SrQ+BmUoQcopVQvnaMcOnykb1VkxUFuDAN+0FnpTFRy2A==}
@@ -2037,8 +2048,8 @@ packages:
   nano-css@5.6.2:
     resolution: {integrity: sha512-+6bHaC8dSDGALM1HJjOHVXpuastdu2xFoZlC77Jh4cg+33Zcgm+Gxd+1xsnpZK14eyHObSp82+ll5y3SX75liw==}
     peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: '*'
+      react-dom: '*'
 
   nanoid@3.3.11:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
@@ -2175,7 +2186,7 @@ packages:
   react-loading-skeleton@3.5.0:
     resolution: {integrity: sha512-gxxSyLbrEAdXTKgfbpBEFZCO/P153DnqSCQau2+o6lNy1jgMRr2MmRmOzMmyrwSaSYLRB8g7b0waYPmUjz7IhQ==}
     peerDependencies:
-      react: ^18.3.1
+      react: '>=16.8.0'
 
   react-refresh@0.14.2:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
@@ -2184,37 +2195,37 @@ packages:
   react-syntax-highlighter@15.6.1:
     resolution: {integrity: sha512-OqJ2/vL7lEeV5zTJyG7kmARppUjiB9h9udl4qHQjjgEos66z00Ia0OckwYfRxCSFrW8RJIBnsBwQsHZbVPspqg==}
     peerDependencies:
-      react: ^18.3.1
+      react: '>= 0.14.0'
 
   react-transition-group@4.4.5:
     resolution: {integrity: sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==}
     peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: '>=16.6.0'
+      react-dom: '>=16.6.0'
 
   react-type-animation@3.2.0:
     resolution: {integrity: sha512-WXTe0i3rRNKjmggPvT5ntye1QBt0ATGbijeW6V3cQe2W0jaMABXXlPPEdtofnS9tM7wSRHchEvI9SUw+0kUohw==}
     peerDependencies:
       prop-types: ^15.5.4
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: '>= 15.0.0'
+      react-dom: '>= 15.0.0'
 
   react-universal-interface@0.6.2:
     resolution: {integrity: sha512-dg8yXdcQmvgR13RIlZbTRQOoUrDciFVoSBZILwjE2LFISxZZ8loVJKAkuzswl5js8BHda79bIb2b84ehU8IjXw==}
     peerDependencies:
-      react: ^18.3.1
+      react: '*'
       tslib: '*'
 
   react-use@17.6.0:
     resolution: {integrity: sha512-OmedEScUMKFfzn1Ir8dBxiLLSOzhKe/dPZwVxcujweSj45aNM7BEGPb9BEVIgVEqEXx6f3/TsXzwIktNgUR02g==}
     peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: '*'
+      react-dom: '*'
 
   react-usestateref@1.0.9:
     resolution: {integrity: sha512-t8KLsI7oje0HzfzGhxFXzuwbf1z9vhBM1ptHLUIHhYqZDKFuI5tzdhEVxSNzUkYxwF8XdpOErzHlKxvP7sTERw==}
     peerDependencies:
-      react: ^18.3.1
+      react: '>16.0.0'
 
   react@18.3.1:
     resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
@@ -2223,8 +2234,8 @@ packages:
   reactflow@11.11.4:
     resolution: {integrity: sha512-70FOtJkUWH3BAOsN+LU9lCrKoKbtOPnz2uq0CV2PLdNSwxTXOhCbsZr50GmZ+Rtw3jx8Uv7/vBFtCGixLfd4Og==}
     peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
+      react: '>=17'
+      react-dom: '>=17'
 
   readdirp@3.6.0:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
@@ -2455,7 +2466,7 @@ packages:
   use-sync-external-store@1.6.0:
     resolution: {integrity: sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==}
     peerDependencies:
-      react: ^18.3.1
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   uuid@10.0.0:
     resolution: {integrity: sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==}
@@ -2582,7 +2593,7 @@ packages:
     peerDependencies:
       '@types/react': '>=16.8'
       immer: '>=9.0.6'
-      react: ^18.3.1
+      react: '>=16.8'
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -2681,6 +2692,19 @@ snapshots:
       - supports-color
 
   '@automerge/automerge-repo@2.5.0-alpha.2':
+    dependencies:
+      '@automerge/automerge': 3.2.1
+      bs58check: 3.0.1
+      cbor-x: 1.6.0
+      debug: 4.4.3(supports-color@5.5.0)
+      eventemitter3: 5.0.1
+      fast-sha256: 1.3.0
+      uuid: 9.0.1
+      xstate: 5.25.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@automerge/automerge-repo@2.5.2-alpha.0':
     dependencies:
       '@automerge/automerge': 3.2.1
       bs58check: 3.0.1
@@ -3101,10 +3125,35 @@ snapshots:
 
   '@humanwhocodes/object-schema@2.0.3': {}
 
-  '@inkandswitch/patchwork-bootloader@0.0.4(@automerge/automerge-repo-keyhive@0.0.0-alpha.71)(@automerge/automerge-repo@2.5.0)(@automerge/automerge@3.2.1)(@automerge/vanillajs@2.5.0)(@keyhive/keyhive@0.0.0-alpha.40)':
+  '@inkandswitch/annotations-context@0.1.4':
+    dependencies:
+      '@inkandswitch/annotations': 0.1.4
+    transitivePeerDependencies:
+      - supports-color
+
+  '@inkandswitch/annotations-diff@0.1.4':
     dependencies:
       '@automerge/automerge': 3.2.1
-      '@automerge/automerge-repo': 2.5.0
+      '@automerge/automerge-repo': 2.5.2-alpha.0
+      '@inkandswitch/annotations': 0.1.4
+      '@inkandswitch/annotations-context': 0.1.4
+      '@inkandswitch/patchwork-refs': 0.1.3
+      '@inkandswitch/subscribables': 0.1.2
+    transitivePeerDependencies:
+      - supports-color
+
+  '@inkandswitch/annotations@0.1.4':
+    dependencies:
+      '@inkandswitch/patchwork-refs': 0.1.3
+      '@inkandswitch/subscribables': 0.1.2
+      eventemitter3: 5.0.1
+    transitivePeerDependencies:
+      - supports-color
+
+  '@inkandswitch/patchwork-bootloader@0.0.4(@automerge/automerge-repo-keyhive@0.0.0-alpha.71)(@automerge/automerge-repo@2.5.2-alpha.0)(@automerge/automerge@3.2.1)(@automerge/vanillajs@2.5.0)(@keyhive/keyhive@0.0.0-alpha.40)':
+    dependencies:
+      '@automerge/automerge': 3.2.1
+      '@automerge/automerge-repo': 2.5.2-alpha.0
       '@automerge/automerge-repo-keyhive': 0.0.0-alpha.71
       '@automerge/vanillajs': 2.5.0
       '@keyhive/keyhive': 0.0.0-alpha.40
@@ -3164,6 +3213,22 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+
+  '@inkandswitch/patchwork-refs@0.1.3':
+    dependencies:
+      '@automerge/automerge': 3.2.1
+      '@automerge/automerge-repo': 2.5.2-alpha.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@inkandswitch/subscribables-react@0.1.2(react@18.3.1)':
+    dependencies:
+      '@inkandswitch/subscribables': 0.1.2
+      react: 18.3.1
+
+  '@inkandswitch/subscribables@0.1.2':
+    dependencies:
+      eventemitter3: 5.0.1
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
