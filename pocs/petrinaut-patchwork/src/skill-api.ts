@@ -1,3 +1,4 @@
+import { cursor } from "@automerge/automerge-repo";
 import type { AutomergeUrl, DocHandle } from "@automerge/automerge-repo";
 import type { Workspace } from "@patchwork/llm";
 import type {
@@ -16,6 +17,19 @@ type PetriNetDoc = {
 	"@patchwork": { type: "petrinaut-petrinet" };
 	title: string;
 	petriNetDefinition: SDCPN;
+	"@provenance"?: { entries: ProvenanceEntry[] };
+};
+
+// Provenance: where the net (or parts of it) came from. Entries live in this
+// document and point back at their sources; Patchwork's provenance provider
+// indexes them so source documents can show inbound links. Targets and
+// sources are ALWAYS automerge urls — ref urls into a doc, or bare doc urls.
+type ProvenanceEntry = {
+	id: string;
+	targets: AutomergeUrl[];
+	sources: AutomergeUrl[];
+	createdAt?: number;
+	note?: string;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -36,6 +50,34 @@ function findTransition(def: SDCPN, nameOrId: string) {
 		(t) => t.name === nameOrId || t.id === nameOrId,
 	);
 }
+
+// Build a ref url into a document. The host runtime exposes `handle.sub(...)`
+// (subduction) or `handle.ref(...)` (upstream automerge-repo) — same call
+// shape, different name — so tolerate both.
+function makeRefUrl(handle: DocHandle<unknown>, path: unknown[]): AutomergeUrl {
+	const h = handle as unknown as {
+		sub?: (...segments: unknown[]) => { url: AutomergeUrl };
+		ref?: (...segments: unknown[]) => { url: AutomergeUrl };
+	};
+	const make = h.sub ?? h.ref;
+	if (!make) {
+		throw new Error(
+			"This automerge-repo runtime has neither handle.sub nor handle.ref — cannot build ref urls",
+		);
+	}
+	return make.apply(handle, path).url;
+}
+
+// The array each element kind lives in under `petriNetDefinition`.
+const ELEMENT_ARRAYS = {
+	place: "places",
+	transition: "transitions",
+	type: "types",
+	parameter: "parameters",
+	differentialEquation: "differentialEquations",
+} as const;
+
+type ElementKind = keyof typeof ELEMENT_ARRAYS;
 
 type RemoveItem =
 	| { type: "place"; id: string }
@@ -223,6 +265,20 @@ export default function (workspace: Workspace) {
 				};
 			});
 			return { handle, url: handle.url };
+		},
+
+		// A cursor-anchored ref url for a text range in another document
+		// (e.g. the paragraph a net was generated from). The anchor survives
+		// edits to the text. `path` is where the text lives in that doc —
+		// ["content"] for standard text documents.
+		async textRangeRef(
+			url: AutomergeUrl,
+			from: number,
+			to: number,
+			path: string[] = ["content"],
+		): Promise<AutomergeUrl> {
+			const handle = await workspace.find(url);
+			return makeRefUrl(handle, [...path, cursor(from, to)]);
 		},
 
 		async getPetriNet(url: AutomergeUrl) {
@@ -460,6 +516,47 @@ export default function (workspace: Workspace) {
 					handle.change((doc) => {
 						doc.title = title;
 					});
+				},
+
+				// ── Provenance ──────────────────────────────────────────────
+
+				// A ref url addressing one element of this net (matched by id,
+				// so it stays stable across array splices). Use these as
+				// `targets` in addProvenance.
+				getElementUrl(item: { type: ElementKind; id: string }): AutomergeUrl {
+					return makeRefUrl(handle, [
+						"petriNetDefinition",
+						ELEMENT_ARRAYS[item.type],
+						{ id: item.id },
+					]);
+				},
+
+				// Record where parts of this net came from. Call this whenever
+				// elements are generated or derived from another document.
+				// `targets` are urls into THIS net (see getElementUrl, or the
+				// bare net url for whole-net provenance); `sources` are urls
+				// into the source document (see textRangeRef, or its bare url).
+				addProvenance(args: {
+					targets: AutomergeUrl[];
+					sources: AutomergeUrl[];
+					note?: string;
+				}): ProvenanceEntry {
+					const entry: ProvenanceEntry = {
+						id: crypto.randomUUID(),
+						targets: args.targets,
+						sources: args.sources,
+						createdAt: Date.now(),
+						...(args.note !== undefined ? { note: args.note } : {}),
+					};
+					handle.change((doc) => {
+						doc["@provenance"] ??= { entries: [] };
+						doc["@provenance"].entries.push(entry);
+					});
+					return entry;
+				},
+
+				getProvenance(): ProvenanceEntry[] {
+					return handle.doc()?.["@provenance"]?.entries ?? [];
 				},
 
 				// ── Delete ──────────────────────────────────────────────────

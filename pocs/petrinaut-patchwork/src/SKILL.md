@@ -13,6 +13,7 @@ Read and write a Stochastic Dynamic Coloured Petri Net (SDCPN) document. Support
 | --- | --- |
 | `await createPetriNet(title?)` | Create a new empty Petri net document. Returns `{ handle, url }`. |
 | `await getPetriNet(url)` | Get a read/write interface for an existing Petri net document. |
+| `await textRangeRef(url, from, to, path?)` | An edit-stable automerge ref URL for a text range in another document. `path` defaults to `["content"]`. Use for provenance `sources`. |
 
 ## Types
 
@@ -103,6 +104,9 @@ Returned by `getPetriNet(url)`. All read methods are synchronous; all write meth
 | `addDifferentialEquation(args)` | Add a differential equation. Returns the created equation. |
 | `addParameter(args)` | Add a global parameter. Returns the created Parameter. |
 | `setTitle(title)` | Set the document title. |
+| `getElementUrl(item)` | An automerge ref URL addressing one element of this net (`{ type, id }`). Use for provenance `targets`. |
+| `addProvenance(args)` | Record where parts of this net came from — see Provenance below. |
+| `getProvenance()` | Returns all provenance entries. |
 | `removeItems(items)` | Cascading delete — see Remove Items below. |
 | `modifyNetElements({ add, remove })` | Batch add and/or remove in a single transaction. |
 
@@ -249,6 +253,61 @@ net.addParameter({
   type: "real",                     // "real" | "integer" | "boolean"
   defaultValue: "0.3"              // required, as string
 });
+```
+
+## Provenance
+
+**Whenever you generate or derive net elements from another document — a text
+artifact, notes, a dataset, a chat — record provenance on the net.** Provenance
+links what you created back to what it came from; Patchwork uses it to
+highlight the source text and the generated elements together.
+
+Targets and sources are **always automerge URLs**:
+
+- `targets` — what in *this net* was generated: `net.getElementUrl({ type, id })`
+  for individual elements, or the bare net `url` for the whole net.
+  Element types: `"place"`, `"transition"`, `"type"`, `"parameter"`,
+  `"differentialEquation"`.
+- `sources` — where it came from: `await textRangeRef(docUrl, from, to)` for a
+  text range (character offsets into the document's `content`), or the bare
+  source document URL when no finer range applies.
+
+### `addProvenance(args)`
+
+```javascript
+const { url } = await createPetriNet("SIR Model");
+const net = await getPetriNet(url);
+
+const susceptible = net.addPlace({ name: "Susceptible", x: 100, y: 200 });
+const infected = net.addPlace({ name: "Infected", x: 300, y: 200 });
+
+// The paragraph (chars 120–348 of the source text) these places came from:
+const source = await textRangeRef(sourceDocUrl, 120, 348);
+
+net.addProvenance({
+  targets: [
+    net.getElementUrl({ type: "place", id: susceptible.id }),
+    net.getElementUrl({ type: "place", id: infected.id }),
+  ],
+  sources: [source],
+  note: "SIR compartments described in the problem statement", // optional
+});
+```
+
+Record one entry per coherent generation step (e.g. one entry for the places a
+paragraph produced), not one entry per element. If you built the whole net from
+one document and can't attribute individual elements, a single whole-net entry
+is fine:
+
+```javascript
+net.addProvenance({ targets: [net.url], sources: [sourceDocUrl] });
+```
+
+### `getProvenance()`
+
+```javascript
+const entries = net.getProvenance();
+// [{ id, targets: [...], sources: [...], createdAt, note? }]
 ```
 
 ### `removeItems(items)`

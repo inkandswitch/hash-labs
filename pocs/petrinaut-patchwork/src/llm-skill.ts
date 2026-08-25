@@ -130,6 +130,26 @@ parameters.infection_rate)", transitionKernelCode "export default
 TransitionKernel(() => ({}))", plus a parameter with variableName
 "infection_rate" and defaultValue "0.3".
 
+### Provenance
+
+When you build or extend a net FROM another document (a text artifact, notes,
+data you were shown), record where it came from in a top-level "@provenance"
+section — a sibling of petriNetDefinition, NOT inside it:
+
+{ "@provenance": { "entries": [ { "id": "<uuid>",
+  "targets": ["<automerge url>"], "sources": ["<automerge url>"],
+  "createdAt": <ms timestamp> } ] }
+
+targets and sources are ALWAYS automerge urls. targets say what in this net
+was generated — use the net's own document url. sources say what it was
+generated from — use the source document's url. Add one entry per generation
+step, in the same batch as the elements it describes. If the section is
+missing, create it: path [], range "@provenance", value { "entries": [...] };
+append later entries with path ["@provenance","entries"], range [N,N].
+
+Do not add provenance for edits the user asked for directly with no source
+document — only when the net is derived from other material.
+
 ### Workflow
 
 1. read_doc the focused document to see the current net and array lengths.
@@ -140,7 +160,9 @@ TransitionKernel(() => ({}))", plus a parameter with variableName
 3. Add colours and parameters BEFORE the places and transitions that reference
    them, so the ids exist.
 4. Apply edits with automerge_op, re-reading indices between structural changes.
-5. read_doc to verify, then explain the modelling choices — the user can
+5. If the net was generated from another document, record a "@provenance"
+   entry pointing at it (see Provenance above).
+6. read_doc to verify, then explain the modelling choices — the user can
    already see the nodes, so describe why the net behaves as it does.
 `.trim();
 
