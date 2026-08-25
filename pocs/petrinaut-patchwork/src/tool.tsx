@@ -17,6 +17,7 @@ import { createElement, Fragment, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import type { Doc } from "./datatype";
 import { NetDiffOverlay, useNetDiff } from "./diff-overlay";
+import { ProvenanceOverlay } from "./provenance-overlay";
 
 export const renderPetrinautEditor: ToolImplementation<Doc> = (
 	handle,
@@ -53,6 +54,7 @@ export const PetrinautEditor = ({
 				lspWorkerFactory={createLanguageServerWorker}
 			/>
 			<NetDiffOverlay diff={diff} element={element} />
+			<ProvenanceOverlay handle={handle} element={element} />
 		</Fragment>
 	);
 };

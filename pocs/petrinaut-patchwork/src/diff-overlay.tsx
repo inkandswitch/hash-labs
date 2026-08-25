@@ -99,8 +99,9 @@ type Baseline = { heads: UrlHeads | null };
  * the handle the diff would freeze at whatever it was when the draft was
  * checked out. Bumps are coalesced into a microtask so the recompute never
  * runs synchronously inside Automerge's own change callback.
+ * (Exported for the provenance overlay, which has the same need.)
  */
-function useDocVersion(handle: DocHandle<Doc>): number {
+export function useDocVersion(handle: DocHandle<Doc>): number {
 	const [version, setVersion] = useState(0);
 
 	useEffect(() => {
