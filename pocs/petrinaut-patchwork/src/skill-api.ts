@@ -32,6 +32,13 @@ type ProvenanceEntry = {
 	note?: string;
 };
 
+// Passed alongside a creation call: "the elements this call creates came from
+// these sources". The created elements become the entry's targets.
+type ProvenanceArgs = {
+	sources: AutomergeUrl[];
+	note?: string;
+};
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const ARC_ID_PREFIX = "$A_";
@@ -66,6 +73,40 @@ function makeRefUrl(handle: DocHandle<unknown>, path: unknown[]): AutomergeUrl {
 		);
 	}
 	return make.apply(handle, path).url;
+}
+
+// A ref url addressing one element of a net by id (stable across splices).
+function elementRefUrl(
+	handle: DocHandle<unknown>,
+	kind: ElementKind,
+	id: string,
+): AutomergeUrl {
+	return makeRefUrl(handle, [
+		"petriNetDefinition",
+		ELEMENT_ARRAYS[kind],
+		{ id },
+	]);
+}
+
+// Append one provenance entry with the given targets. The shared tail of
+// addProvenance and of every creation method's `provenance` option.
+function appendProvenanceEntry(
+	handle: DocHandle<PetriNetDoc>,
+	targets: AutomergeUrl[],
+	provenance: ProvenanceArgs,
+): ProvenanceEntry {
+	const entry: ProvenanceEntry = {
+		id: crypto.randomUUID(),
+		targets,
+		sources: provenance.sources,
+		createdAt: Date.now(),
+		...(provenance.note !== undefined ? { note: provenance.note } : {}),
+	};
+	handle.change((doc) => {
+		doc["@provenance"] ??= { entries: [] };
+		doc["@provenance"].entries.push(entry);
+	});
+	return entry;
 }
 
 // The array each element kind lives in under `petriNetDefinition`.
@@ -248,7 +289,9 @@ type BatchAdd = {
 
 export default function (workspace: Workspace) {
 	return {
-		async createPetriNet(title?: string) {
+		// Pass `provenance` when the net is being built FROM another document:
+		// a whole-net entry pointing at the sources is recorded right away.
+		async createPetriNet(title?: string, provenance?: ProvenanceArgs) {
 			const handle: DocHandle<PetriNetDoc> = await workspace.create<PetriNetDoc>({
 				name: title ?? "Untitled Petri Net",
 				type: "petrinaut-petrinet",
@@ -264,6 +307,9 @@ export default function (workspace: Workspace) {
 					differentialEquations: [],
 				};
 			});
+			if (provenance) {
+				appendProvenanceEntry(handle, [handle.url], provenance);
+			}
 			return { handle, url: handle.url };
 		},
 
@@ -362,6 +408,7 @@ export default function (workspace: Workspace) {
 					dynamicsEnabled?: boolean;
 					differentialEquationId?: string;
 					visualizerCode?: string;
+					provenance?: ProvenanceArgs;
 				}) {
 					const newPlace: Place = {
 						id: crypto.randomUUID(),
@@ -376,6 +423,13 @@ export default function (workspace: Workspace) {
 					handle.change((doc) => {
 						doc.petriNetDefinition.places.push(newPlace);
 					});
+					if (args.provenance) {
+						appendProvenanceEntry(
+							handle,
+							[elementRefUrl(handle, "place", newPlace.id)],
+							args.provenance,
+						);
+					}
 					return newPlace;
 				},
 
@@ -388,6 +442,7 @@ export default function (workspace: Workspace) {
 					transitionKernelCode?: string;
 					inputArcs: Transition["inputArcs"];
 					outputArcs: Transition["outputArcs"];
+					provenance?: ProvenanceArgs;
 				}) {
 					const newTransition: Transition = {
 						id: crypto.randomUUID(),
@@ -403,6 +458,13 @@ export default function (workspace: Workspace) {
 					handle.change((doc) => {
 						doc.petriNetDefinition.transitions.push(newTransition);
 					});
+					if (args.provenance) {
+						appendProvenanceEntry(
+							handle,
+							[elementRefUrl(handle, "transition", newTransition.id)],
+							args.provenance,
+						);
+					}
 					return newTransition;
 				},
 
@@ -458,6 +520,7 @@ export default function (workspace: Workspace) {
 						name: string;
 						type: "real" | "integer" | "boolean";
 					}>;
+					provenance?: ProvenanceArgs;
 				}) {
 					const newColor: Color = {
 						id: crypto.randomUUID(),
@@ -473,6 +536,13 @@ export default function (workspace: Workspace) {
 					handle.change((doc) => {
 						doc.petriNetDefinition.types.push(newColor);
 					});
+					if (args.provenance) {
+						appendProvenanceEntry(
+							handle,
+							[elementRefUrl(handle, "type", newColor.id)],
+							args.provenance,
+						);
+					}
 					return newColor;
 				},
 
@@ -480,6 +550,7 @@ export default function (workspace: Workspace) {
 					name: string;
 					colorId: string;
 					code: string;
+					provenance?: ProvenanceArgs;
 				}) {
 					const newEq: DifferentialEquation = {
 						id: crypto.randomUUID(),
@@ -490,6 +561,13 @@ export default function (workspace: Workspace) {
 					handle.change((doc) => {
 						doc.petriNetDefinition.differentialEquations.push(newEq);
 					});
+					if (args.provenance) {
+						appendProvenanceEntry(
+							handle,
+							[elementRefUrl(handle, "differentialEquation", newEq.id)],
+							args.provenance,
+						);
+					}
 					return newEq;
 				},
 
@@ -498,6 +576,7 @@ export default function (workspace: Workspace) {
 					variableName: string;
 					type: "real" | "integer" | "boolean";
 					defaultValue: string;
+					provenance?: ProvenanceArgs;
 				}) {
 					const newParam: Parameter = {
 						id: crypto.randomUUID(),
@@ -509,6 +588,13 @@ export default function (workspace: Workspace) {
 					handle.change((doc) => {
 						doc.petriNetDefinition.parameters.push(newParam);
 					});
+					if (args.provenance) {
+						appendProvenanceEntry(
+							handle,
+							[elementRefUrl(handle, "parameter", newParam.id)],
+							args.provenance,
+						);
+					}
 					return newParam;
 				},
 
@@ -522,37 +608,27 @@ export default function (workspace: Workspace) {
 
 				// A ref url addressing one element of this net (matched by id,
 				// so it stays stable across array splices). Use these as
-				// `targets` in addProvenance.
+				// `targets` in addProvenance. Usually you won't need this:
+				// prefer passing `provenance` to the creation call itself.
 				getElementUrl(item: { type: ElementKind; id: string }): AutomergeUrl {
-					return makeRefUrl(handle, [
-						"petriNetDefinition",
-						ELEMENT_ARRAYS[item.type],
-						{ id: item.id },
-					]);
+					return elementRefUrl(handle, item.type, item.id);
 				},
 
-				// Record where parts of this net came from. Call this whenever
-				// elements are generated or derived from another document.
-				// `targets` are urls into THIS net (see getElementUrl, or the
-				// bare net url for whole-net provenance); `sources` are urls
-				// into the source document (see textRangeRef, or its bare url).
+				// Record where parts of this net came from, after the fact.
+				// Prefer the `provenance` option on the creation methods, which
+				// targets the created elements automatically; use this for
+				// attributing EXISTING elements or the whole net (`targets:
+				// [net.url]`). `sources` are urls into the source document
+				// (see textRangeRef, or its bare url).
 				addProvenance(args: {
 					targets: AutomergeUrl[];
 					sources: AutomergeUrl[];
 					note?: string;
 				}): ProvenanceEntry {
-					const entry: ProvenanceEntry = {
-						id: crypto.randomUUID(),
-						targets: args.targets,
+					return appendProvenanceEntry(handle, args.targets, {
 						sources: args.sources,
-						createdAt: Date.now(),
-						...(args.note !== undefined ? { note: args.note } : {}),
-					};
-					handle.change((doc) => {
-						doc["@provenance"] ??= { entries: [] };
-						doc["@provenance"].entries.push(entry);
+						note: args.note,
 					});
-					return entry;
 				},
 
 				getProvenance(): ProvenanceEntry[] {
@@ -570,15 +646,23 @@ export default function (workspace: Workspace) {
 
 				// ── Batch modify ────────────────────────────────────────────
 
+				// Batch add and/or remove in one transaction. Pass `provenance`
+				// when the added elements are derived from another document —
+				// one entry targeting everything this call created is recorded.
+				// Returns the created places and transitions (with their ids).
 				modifyNetElements({
 					add,
 					remove,
+					provenance,
 				}: {
 					add?: BatchAdd;
 					remove?: RemoveItem[];
-				}) {
+					provenance?: ProvenanceArgs;
+				}): { places: Place[]; transitions: Transition[] } {
 					const placeIdMap = new Map<string, string>();
 					const transitionIdMap = new Map<string, string>();
+					const createdPlaces: Place[] = [];
+					const createdTransitions: Transition[] = [];
 
 					handle.change((doc) => {
 						const def: SDCPN = doc.petriNetDefinition;
@@ -603,6 +687,7 @@ export default function (workspace: Workspace) {
 									visualizerCode: p.visualizerCode,
 								};
 								placeIdMap.set(p.name, newPlace.id);
+								createdPlaces.push(newPlace);
 								def.places.push(newPlace);
 							}
 						}
@@ -622,6 +707,7 @@ export default function (workspace: Workspace) {
 									y: t.y ?? 100,
 								};
 								transitionIdMap.set(t.name, newTransition.id);
+								createdTransitions.push(newTransition);
 								def.transitions.push(newTransition);
 							}
 						}
@@ -713,6 +799,29 @@ export default function (workspace: Workspace) {
 							}
 						}
 					});
+
+					if (provenance) {
+						// Target each created element; if the call only removed
+						// or rewired things, fall back to the whole net.
+						const targets: AutomergeUrl[] = [
+							...createdPlaces.map((p) =>
+								elementRefUrl(handle, "place", p.id),
+							),
+							...createdTransitions.map((t) =>
+								elementRefUrl(handle, "transition", t.id),
+							),
+						];
+						appendProvenanceEntry(
+							handle,
+							targets.length > 0 ? targets : [handle.url],
+							provenance,
+						);
+					}
+
+					return {
+						places: createdPlaces,
+						transitions: createdTransitions,
+					};
 				},
 			};
 		},

@@ -97,25 +97,29 @@ Returned by `getPetriNet(url)`. All read methods are synchronous; all write meth
 | `getDifferentialEquations()` | Returns all differential equations. |
 | `getParameters()` | Returns all global parameters. |
 | `getTitle()` | Returns the document title. |
-| `addPlace(args)` | Add a place. Returns the created Place. |
-| `addTransition(args)` | Add a transition. `inputArcs` and `outputArcs` are required (use `[]` if none). Returns the created Transition. |
+| `addPlace(args)` | Add a place. Returns the created Place. Takes an optional `provenance`. |
+| `addTransition(args)` | Add a transition. `inputArcs` and `outputArcs` are required (use `[]` if none). Returns the created Transition. Takes an optional `provenance`. |
 | `addArc(args)` | Add an arc between a place and a transition. |
-| `addColor(args)` | Add a color/type definition. Returns the created Color. |
-| `addDifferentialEquation(args)` | Add a differential equation. Returns the created equation. |
-| `addParameter(args)` | Add a global parameter. Returns the created Parameter. |
+| `addColor(args)` | Add a color/type definition. Returns the created Color. Takes an optional `provenance`. |
+| `addDifferentialEquation(args)` | Add a differential equation. Returns the created equation. Takes an optional `provenance`. |
+| `addParameter(args)` | Add a global parameter. Returns the created Parameter. Takes an optional `provenance`. |
 | `setTitle(title)` | Set the document title. |
-| `getElementUrl(item)` | An automerge ref URL addressing one element of this net (`{ type, id }`). Use for provenance `targets`. |
-| `addProvenance(args)` | Record where parts of this net came from — see Provenance below. |
+| `getElementUrl(item)` | An automerge ref URL addressing one element of this net (`{ type, id }`). For `addProvenance` targets; not needed with the `provenance` option. |
+| `addProvenance(args)` | Attribute EXISTING elements (or the whole net) after the fact — see Provenance below. |
 | `getProvenance()` | Returns all provenance entries. |
 | `removeItems(items)` | Cascading delete — see Remove Items below. |
-| `modifyNetElements({ add, remove })` | Batch add and/or remove in a single transaction. |
+| `modifyNetElements({ add, remove, provenance? })` | Batch add and/or remove in one transaction. Returns `{ places, transitions }` it created. |
 
 ## Method Details
 
-### `createPetriNet(title?)`
+### `createPetriNet(title?, provenance?)`
 
 ```javascript
 const { handle, url } = await createPetriNet("SIR Model");
+
+// Building the net FROM another document? Say so at creation — this records
+// a whole-net provenance entry pointing at the source:
+const { url } = await createPetriNet("SIR Model", { sources: [sourceDocUrl] });
 ```
 
 ### `getPetriNet(url)`
@@ -262,44 +266,57 @@ artifact, notes, a dataset, a chat — record provenance on the net.** Provenanc
 links what you created back to what it came from; Patchwork uses it to
 highlight the source text and the generated elements together.
 
-Targets and sources are **always automerge URLs**:
+Sources are **always automerge URLs**: `await textRangeRef(docUrl, from, to)`
+for a text range (character offsets into the document's `content`), or the
+bare source document URL when no finer range applies.
 
-- `targets` — what in *this net* was generated: `net.getElementUrl({ type, id })`
-  for individual elements, or the bare net `url` for the whole net.
-  Element types: `"place"`, `"transition"`, `"type"`, `"parameter"`,
-  `"differentialEquation"`.
-- `sources` — where it came from: `await textRangeRef(docUrl, from, to)` for a
-  text range (character offsets into the document's `content`), or the bare
-  source document URL when no finer range applies.
+### The easy way: `provenance` on creation calls
 
-### `addProvenance(args)`
+Every creation method takes an optional `provenance: { sources, note? }` and
+records the entry for you, targeting exactly what the call created:
 
 ```javascript
-const { url } = await createPetriNet("SIR Model");
-const net = await getPetriNet(url);
-
-const susceptible = net.addPlace({ name: "Susceptible", x: 100, y: 200 });
-const infected = net.addPlace({ name: "Infected", x: 300, y: 200 });
-
-// The paragraph (chars 120–348 of the source text) these places came from:
+// The paragraph (chars 120–348 of the source text) this step derives from:
 const source = await textRangeRef(sourceDocUrl, 120, 348);
 
-net.addProvenance({
-  targets: [
-    net.getElementUrl({ type: "place", id: susceptible.id }),
-    net.getElementUrl({ type: "place", id: infected.id }),
-  ],
-  sources: [source],
-  note: "SIR compartments described in the problem statement", // optional
+net.modifyNetElements({
+  add: {
+    places: [
+      { name: "Susceptible", x: 100, y: 200 },
+      { name: "Infected", x: 300, y: 200 },
+    ],
+    transitions: [ /* ... */ ],
+    arcs: [ /* ... */ ],
+  },
+  provenance: {
+    sources: [source],
+    note: "SIR compartments described in the problem statement", // optional
+  },
 });
 ```
 
-Record one entry per coherent generation step (e.g. one entry for the places a
-paragraph produced), not one entry per element. If you built the whole net from
-one document and can't attribute individual elements, a single whole-net entry
-is fine:
+The same option works on `addPlace`, `addTransition`, `addColor`,
+`addDifferentialEquation`, `addParameter` (targeting the one created element),
+and on `createPetriNet(title, provenance)` (targeting the whole net).
+
+Record one entry per coherent generation step — pass the same `provenance` to
+one batched `modifyNetElements` call rather than repeating it per element.
+
+### After the fact: `addProvenance(args)`
+
+For attributing elements that already exist. `targets` are automerge URLs into
+this net: `net.getElementUrl({ type, id })` for individual elements (types:
+`"place"`, `"transition"`, `"type"`, `"parameter"`, `"differentialEquation"`),
+or the bare net `url` for the whole net:
 
 ```javascript
+net.addProvenance({
+  targets: [net.getElementUrl({ type: "place", id: susceptible.id })],
+  sources: [await textRangeRef(sourceDocUrl, 120, 348)],
+  note: "optional",
+});
+
+// Whole net from one document:
 net.addProvenance({ targets: [net.url], sources: [sourceDocUrl] });
 ```
 
@@ -327,9 +344,9 @@ net.removeItems([
 
 Arc IDs follow the format `$A_<sourceId>___<targetId>` where source is the place id for input arcs (place -> transition) and the transition id for output arcs (transition -> place).
 
-### `modifyNetElements({ add, remove })`
+### `modifyNetElements({ add, remove, provenance? })`
 
-Batch operation. Removals run first, then additions — so you can replace subgraphs in one call. Arcs in the `add.arcs` array can reference places/transitions created in the same batch by name.
+Batch operation. Removals run first, then additions — so you can replace subgraphs in one call. Arcs in the `add.arcs` array can reference places/transitions created in the same batch by name. Returns `{ places, transitions }` — the created elements with their generated ids. Pass `provenance: { sources, note? }` when the batch derives from another document (see Provenance above).
 
 ```javascript
 net.modifyNetElements({
