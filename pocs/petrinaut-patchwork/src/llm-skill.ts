@@ -133,12 +133,14 @@ TransitionKernel(() => ({}))", plus a parameter with variableName
 ### Provenance
 
 When you build or extend a net FROM another document (a text artifact, notes,
-data you were shown), record where it came from in a top-level "@provenance"
-section — a sibling of petriNetDefinition, NOT inside it:
+data you were shown), record where it came from under the document's
+"@patchwork" envelope — NEVER change "@patchwork".type, but "provenance"
+(and "metadata", below) inside it are yours to write:
 
-{ "@provenance": { "entries": [ { "id": "<uuid>",
-  "targets": ["<ref url>"], "sources": ["<ref url>"],
-  "createdAt": <ms timestamp> } ] }
+{ "@patchwork": { "type": "petrinaut-petrinet",
+  "provenance": [ { "id": "<uuid>",
+    "targets": ["<ref url>"], "sources": ["<ref url>"],
+    "createdAt": <ms timestamp> } ] } }
 
 targets and sources are ALWAYS automerge urls, and they should be GRANULAR
 ref urls minted with the make_ref tool — bare document urls only as a last
@@ -161,12 +163,31 @@ Record ONE entry per generation step — e.g. the paragraph that described the
 compartments as the source, the places it produced as the targets — not one
 blanket whole-doc entry, and not one entry per element when several elements
 share a source. Add the entry in the same batch as the elements it describes.
-If the section is missing, create it: path [], range "@provenance", value
-{ "entries": [...] }; append later entries with
-path ["@provenance","entries"], range [N,N].
+If the array is missing, create it: path ["@patchwork"], range "provenance",
+value [...]; append later entries with
+path ["@patchwork","provenance"], range [N,N].
 
 Do not add provenance for edits the user asked for directly with no source
 document — only when the net is derived from other material.
+
+### Element metadata (geo)
+
+"@patchwork".metadata holds arbitrary per-element annotations, keyed by the
+element's uuid: { "@patchwork": { "metadata": { "<elementId>": { ... } } } }.
+The one convention tools understand is geo — an element annotated with
+{ "geo": { "lat": <number>, "lng": <number> } } appears as a marker in the
+net's Map view.
+
+When the things you are modelling are real, locatable entities — cities,
+facilities, wards, warehouses, populations of a region — annotate each such
+place (and transition, if it happens somewhere specific) with its
+coordinates as you create it. Use well-known coordinates; do not invent
+precise ones for abstract concepts, and skip geo entirely for abstract nets.
+
+automerge_op recipes: create the section with path ["@patchwork"], range
+"metadata", value { "<elementId>": { "geo": { "lat": 52.52, "lng": 13.405 } } };
+annotate further elements with path ["@patchwork","metadata"], range
+"<elementId>", value { "geo": { ... } }.
 
 ### Workflow
 
@@ -178,9 +199,11 @@ document — only when the net is derived from other material.
 3. Add colours and parameters BEFORE the places and transitions that reference
    them, so the ids exist.
 4. Apply edits with automerge_op, re-reading indices between structural changes.
-5. If the net was generated from another document, record "@provenance"
-   entries with granular make_ref urls — the source passages and the elements
-   they produced (see Provenance above).
+5. If the net was generated from another document, record provenance
+   entries under "@patchwork".provenance with granular make_ref urls — the
+   source passages and the elements they produced (see Provenance above).
+   If the elements are geographically locatable, annotate them under
+   "@patchwork".metadata with geo coordinates (see Element metadata above).
 6. read_doc to verify, then explain the modelling choices — the user can
    already see the nodes, so describe why the net behaves as it does.
 `.trim();

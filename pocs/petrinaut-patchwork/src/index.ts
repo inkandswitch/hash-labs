@@ -24,6 +24,19 @@ export const plugins: Plugin<any>[] = [
 		},
 	},
 	{
+		// Alternate view of the same document: elements annotated with
+		// `@patchwork.metadata[<id>].geo` rendered as markers on a map.
+		type: "patchwork:tool",
+		id: "petrinaut-map",
+		name: "Map",
+		icon: "Map",
+		supportedDatatypes: ["petrinaut-petrinet"],
+		async load() {
+			const { renderPetrinautMap } = await import("./map-tool");
+			return renderPetrinautMap;
+		},
+	},
+	{
 		type: "patchwork:skill",
 		id: "petrinaut-petrinet",
 		name: "Petrinaut Net",

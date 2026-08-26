@@ -13,11 +13,20 @@ import type {
 /** "standard" or "inhibitor" — an inhibitor arc blocks its transition while the place holds tokens. */
 type ArcType = Transition["inputArcs"][number]["type"];
 
+// Everything Patchwork-side lives under the `@patchwork` envelope next to
+// the datatype tag: provenance entries and per-element metadata. NEVER
+// reassign the whole `@patchwork` object — always merge into it, or the
+// other sections get clobbered.
+type PatchworkSection = {
+	type: "petrinaut-petrinet";
+	provenance?: ProvenanceEntry[];
+	metadata?: Record<string, ElementMetadata>;
+};
+
 type PetriNetDoc = {
-	"@patchwork": { type: "petrinaut-petrinet" };
+	"@patchwork": PatchworkSection;
 	title: string;
 	petriNetDefinition: SDCPN;
-	"@provenance"?: { entries: ProvenanceEntry[] };
 };
 
 // Provenance: where the net (or parts of it) came from. Entries live in this
@@ -30,6 +39,14 @@ type ProvenanceEntry = {
 	sources: AutomergeUrl[];
 	createdAt?: number;
 	note?: string;
+};
+
+// Arbitrary per-element annotations, keyed by element id under
+// `@patchwork.metadata`. `geo` is the one convention other tools understand:
+// the Map tool renders every element that has one as a marker.
+type ElementMetadata = {
+	geo?: { lat: number; lng: number };
+	[key: string]: unknown;
 };
 
 // Passed alongside a creation call: "the elements this call creates came from
@@ -103,10 +120,29 @@ function appendProvenanceEntry(
 		...(provenance.note !== undefined ? { note: provenance.note } : {}),
 	};
 	handle.change((doc) => {
-		doc["@provenance"] ??= { entries: [] };
-		doc["@provenance"].entries.push(entry);
+		const patchwork = (doc["@patchwork"] ??= {
+			type: "petrinaut-petrinet",
+		});
+		patchwork.provenance ??= [];
+		patchwork.provenance.push(entry);
 	});
 	return entry;
+}
+
+// Merge a metadata patch into `@patchwork.metadata[<id>]`. Runs INSIDE a
+// handle.change. Undefined values delete the key.
+function writeElementMetadata(
+	doc: PetriNetDoc,
+	id: string,
+	metadata: ElementMetadata,
+) {
+	const patchwork = (doc["@patchwork"] ??= { type: "petrinaut-petrinet" });
+	patchwork.metadata ??= {};
+	const slot = (patchwork.metadata[id] ??= {});
+	for (const [key, value] of Object.entries(metadata)) {
+		if (value === undefined) delete slot[key];
+		else slot[key] = value;
+	}
 }
 
 // The array each element kind lives in under `petriNetDefinition`.
@@ -271,6 +307,7 @@ type BatchAdd = {
 		dynamicsEnabled?: boolean;
 		differentialEquationId?: string;
 		visualizerCode?: string;
+		metadata?: ElementMetadata;
 	}>;
 	transitions?: Array<{
 		name: string;
@@ -281,6 +318,7 @@ type BatchAdd = {
 		transitionKernelCode?: string;
 		inputArcs: Transition["inputArcs"];
 		outputArcs: Transition["outputArcs"];
+		metadata?: ElementMetadata;
 	}>;
 	arcs?: ArcArgs[];
 };
@@ -297,7 +335,12 @@ export default function (workspace: Workspace) {
 				type: "petrinaut-petrinet",
 			});
 			handle.change((doc) => {
-				doc["@patchwork"] = { type: "petrinaut-petrinet" };
+				// Merge, never replace: @patchwork also carries provenance
+				// and metadata sections.
+				const patchwork = (doc["@patchwork"] ??= {
+					type: "petrinaut-petrinet",
+				});
+				patchwork.type = "petrinaut-petrinet";
 				doc.title = title ?? "Untitled Petri Net";
 				doc.petriNetDefinition = {
 					places: [],
@@ -409,6 +452,7 @@ export default function (workspace: Workspace) {
 					differentialEquationId?: string;
 					visualizerCode?: string;
 					provenance?: ProvenanceArgs;
+					metadata?: ElementMetadata;
 				}) {
 					const newPlace: Place = {
 						id: crypto.randomUUID(),
@@ -422,6 +466,9 @@ export default function (workspace: Workspace) {
 					};
 					handle.change((doc) => {
 						doc.petriNetDefinition.places.push(newPlace);
+						if (args.metadata) {
+							writeElementMetadata(doc, newPlace.id, args.metadata);
+						}
 					});
 					if (args.provenance) {
 						appendProvenanceEntry(
@@ -443,6 +490,7 @@ export default function (workspace: Workspace) {
 					inputArcs: Transition["inputArcs"];
 					outputArcs: Transition["outputArcs"];
 					provenance?: ProvenanceArgs;
+					metadata?: ElementMetadata;
 				}) {
 					const newTransition: Transition = {
 						id: crypto.randomUUID(),
@@ -457,6 +505,13 @@ export default function (workspace: Workspace) {
 					};
 					handle.change((doc) => {
 						doc.petriNetDefinition.transitions.push(newTransition);
+						if (args.metadata) {
+							writeElementMetadata(
+								doc,
+								newTransition.id,
+								args.metadata,
+							);
+						}
 					});
 					if (args.provenance) {
 						appendProvenanceEntry(
@@ -632,7 +687,26 @@ export default function (workspace: Workspace) {
 				},
 
 				getProvenance(): ProvenanceEntry[] {
-					return handle.doc()?.["@provenance"]?.entries ?? [];
+					return handle.doc()?.["@patchwork"]?.provenance ?? [];
+				},
+
+				// ── Metadata ────────────────────────────────────────────────
+
+				// Merge arbitrary annotations onto one element (place,
+				// transition, …) by id, under `@patchwork.metadata`. Prefer
+				// the `metadata` option on the creation calls. The `geo`
+				// key is a shared convention: `{ geo: { lat, lng } }` puts
+				// the element on the Map tool.
+				setMetadata(id: string, metadata: ElementMetadata) {
+					handle.change((doc) => {
+						writeElementMetadata(doc, id, metadata);
+					});
+				},
+
+				// All metadata (keyed by element id), or one element's.
+				getMetadata(id?: string) {
+					const all = handle.doc()?.["@patchwork"]?.metadata ?? {};
+					return id ? (all[id] ?? {}) : all;
 				},
 
 				// ── Delete ──────────────────────────────────────────────────
@@ -689,6 +763,13 @@ export default function (workspace: Workspace) {
 								placeIdMap.set(p.name, newPlace.id);
 								createdPlaces.push(newPlace);
 								def.places.push(newPlace);
+								if (p.metadata) {
+									writeElementMetadata(
+										doc,
+										newPlace.id,
+										p.metadata,
+									);
+								}
 							}
 						}
 
@@ -709,6 +790,13 @@ export default function (workspace: Workspace) {
 								transitionIdMap.set(t.name, newTransition.id);
 								createdTransitions.push(newTransition);
 								def.transitions.push(newTransition);
+								if (t.metadata) {
+									writeElementMetadata(
+										doc,
+										newTransition.id,
+										t.metadata,
+									);
+								}
 							}
 						}
 

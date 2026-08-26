@@ -97,8 +97,8 @@ Returned by `getPetriNet(url)`. All read methods are synchronous; all write meth
 | `getDifferentialEquations()` | Returns all differential equations. |
 | `getParameters()` | Returns all global parameters. |
 | `getTitle()` | Returns the document title. |
-| `addPlace(args)` | Add a place. Returns the created Place. Takes an optional `provenance`. |
-| `addTransition(args)` | Add a transition. `inputArcs` and `outputArcs` are required (use `[]` if none). Returns the created Transition. Takes an optional `provenance`. |
+| `addPlace(args)` | Add a place. Returns the created Place. Takes optional `provenance` and `metadata`. |
+| `addTransition(args)` | Add a transition. `inputArcs` and `outputArcs` are required (use `[]` if none). Returns the created Transition. Takes optional `provenance` and `metadata`. |
 | `addArc(args)` | Add an arc between a place and a transition. |
 | `addColor(args)` | Add a color/type definition. Returns the created Color. Takes an optional `provenance`. |
 | `addDifferentialEquation(args)` | Add a differential equation. Returns the created equation. Takes an optional `provenance`. |
@@ -107,6 +107,8 @@ Returned by `getPetriNet(url)`. All read methods are synchronous; all write meth
 | `getElementUrl(item)` | An automerge ref URL addressing one element of this net (`{ type, id }`). For `addProvenance` targets; not needed with the `provenance` option. |
 | `addProvenance(args)` | Attribute EXISTING elements (or the whole net) after the fact — see Provenance below. |
 | `getProvenance()` | Returns all provenance entries. |
+| `setMetadata(id, metadata)` | Merge arbitrary annotations onto one element by id — see Metadata below. |
+| `getMetadata(id?)` | One element's metadata, or all of it keyed by element id. |
 | `removeItems(items)` | Cascading delete — see Remove Items below. |
 | `modifyNetElements({ add, remove, provenance? })` | Batch add and/or remove in one transaction. Returns `{ places, transitions }` it created. |
 
@@ -264,7 +266,9 @@ net.addParameter({
 **Whenever you generate or derive net elements from another document — a text
 artifact, notes, a dataset, a chat — record provenance on the net.** Provenance
 links what you created back to what it came from; Patchwork uses it to
-highlight the source text and the generated elements together.
+highlight the source text and the generated elements together. Entries are
+stored under the document's `@patchwork` envelope (`@patchwork.provenance`),
+next to the datatype tag — the API below reads and writes them for you.
 
 Sources are **always automerge URLs**: `await textRangeRef(docUrl, from, to)`
 for a text range (character offsets into the document's `content`), or the
@@ -326,6 +330,39 @@ net.addProvenance({ targets: [net.url], sources: [sourceDocUrl] });
 const entries = net.getProvenance();
 // [{ id, targets: [...], sources: [...], createdAt, note? }]
 ```
+
+## Metadata
+
+Arbitrary per-element annotations, stored under `@patchwork.metadata` keyed by
+element id. The one convention other tools understand is **geo**: an element
+annotated with `{ geo: { lat, lng } }` appears as a marker in the net's Map
+view — so when the things you are modelling are real, locatable entities
+(cities, facilities, wards, regions), attach coordinates as you create them:
+
+```javascript
+net.addPlace({
+  name: "Berlin ICU beds",
+  metadata: { geo: { lat: 52.52, lng: 13.405 } },
+});
+
+// Also on addTransition, and per item in modifyNetElements batches:
+net.modifyNetElements({
+  add: {
+    places: [
+      { name: "Hamburg", metadata: { geo: { lat: 53.55, lng: 9.99 } } },
+    ],
+  },
+});
+
+// After the fact (merges keys into what's already there):
+net.setMetadata(place.id, { geo: { lat: 48.14, lng: 11.58 } });
+
+net.getMetadata(place.id); // { geo: { ... }, ... }
+net.getMetadata();         // all of it, keyed by element id
+```
+
+Use well-known coordinates; skip geo entirely for abstract nets rather than
+inventing locations.
 
 ### `removeItems(items)`
 
