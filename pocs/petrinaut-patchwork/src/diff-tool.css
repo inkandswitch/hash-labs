@@ -83,6 +83,19 @@
 	cursor: default;
 }
 
+.petrinaut-diff__row.is-clickable {
+	cursor: pointer;
+}
+
+.petrinaut-diff__row.is-clickable:hover {
+	background: #eff6ff;
+}
+
+.petrinaut-diff__row.is-selected {
+	background: #dbeafe;
+	box-shadow: inset 2px 0 0 #3b82f6;
+}
+
 .petrinaut-diff__row-head {
 	display: flex;
 	align-items: baseline;

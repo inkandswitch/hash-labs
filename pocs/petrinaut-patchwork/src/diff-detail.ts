@@ -111,6 +111,7 @@ export function detailedDocDiff(doc: Doc, heads: UrlHeads): DocDiff | null {
 			title: "Parameters",
 			changes: diffEntities(before.parameters, after.parameters, {
 				fields: parameterFields,
+				describe: describeParameter,
 			}),
 		},
 		{
@@ -165,6 +166,9 @@ function diffEntities<T extends { id: string; name: string }>(
 		/** Nodes drawn on the canvas: hover-glowable by id, x/y is a "move". */
 		canvas?: boolean;
 		fields: (previous: T, next: T) => FieldChange[];
+		/** The entity's values, listed one-sided on added and removed rows.
+		 * An empty `before`/`after` tells the panel to skip that side. */
+		describe?: (item: T) => { label: string; value: string }[];
 	},
 ): EntityChange[] {
 	const changes: EntityChange[] = [];
@@ -180,7 +184,9 @@ function diffEntities<T extends { id: string; name: string }>(
 				canvasId,
 				name: item.name,
 				kind: "added",
-				fields: [],
+				fields: (options.describe?.(item) ?? []).map(
+					({ label, value }) => ({ label, before: "", after: value }),
+				),
 			});
 			continue;
 		}
@@ -213,7 +219,9 @@ function diffEntities<T extends { id: string; name: string }>(
 				canvasId: null,
 				name: item.name,
 				kind: "removed",
-				fields: [],
+				fields: (options.describe?.(item) ?? []).map(
+					({ label, value }) => ({ label, before: value, after: "" }),
+				),
 			});
 		}
 	}
@@ -356,6 +364,14 @@ function colorFields(previous: Color, next: Color): FieldChange[] {
 	}
 
 	return changes;
+}
+
+function describeParameter(param: Parameter): { label: string; value: string }[] {
+	return [
+		{ label: "variable", value: param.variableName },
+		{ label: "type", value: param.type },
+		{ label: "default", value: show(param.defaultValue) },
+	];
 }
 
 function parameterFields(previous: Parameter, next: Parameter): FieldChange[] {
