@@ -159,7 +159,7 @@ function removedArcs(before: SDCPN, after: SDCPN): RemovedArc[] {
 	return removed;
 }
 
-type Arc = {
+export type Arc = {
 	from: string;
 	to: string;
 	weight: number;
@@ -167,7 +167,7 @@ type Arc = {
 };
 
 /** Every arc in the net, keyed by the edge id the canvas draws it under. */
-function arcsById(net: SDCPN): Map<string, Arc> {
+export function arcsById(net: SDCPN): Map<string, Arc> {
 	const arcs = new Map<string, Arc>();
 	for (const transition of net.transitions) {
 		for (const input of transition.inputArcs) {
@@ -232,7 +232,7 @@ const EMPTY_NET: SDCPN = {
 };
 
 /** Structural equality over the plain JSON the net decodes to. */
-function isEqual(a: unknown, b: unknown): boolean {
+export function isEqual(a: unknown, b: unknown): boolean {
 	if (a === b) return true;
 	if (typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
 	if (Array.isArray(a) !== Array.isArray(b)) return false;

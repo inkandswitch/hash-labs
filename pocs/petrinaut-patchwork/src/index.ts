@@ -24,6 +24,20 @@ export const plugins: Plugin<any>[] = [
 		},
 	},
 	{
+		// Two-pane diff view: the Petrinaut editor transcluded on the left,
+		// and a detailed list of every property the draft changed on the
+		// right. Hovering a row glows the element on the embedded canvas.
+		type: "patchwork:tool",
+		id: "petrinaut-diff",
+		name: "Diff",
+		icon: "GitCompare",
+		supportedDatatypes: ["petrinaut-petrinet"],
+		async load() {
+			const { renderPetrinautDiff } = await import("./diff-tool");
+			return renderPetrinautDiff;
+		},
+	},
+	{
 		// Alternate view of the same document: elements annotated with
 		// `@patchwork.metadata[<id>].geo` rendered as markers on a map.
 		type: "patchwork:tool",
